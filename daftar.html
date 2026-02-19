@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daftar Oasis SaaS - Mulai Bisnis Autopilot</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-emerald-50 min-h-screen flex items-center justify-center p-6">
+
+    <div class="bg-white p-8 rounded-3xl shadow-xl max-w-md w-full border border-emerald-100">
+        <div class="text-center mb-8">
+            <span class="text-4xl">🌿</span>
+            <h1 class="text-2xl font-bold text-slate-800 mt-2">Daftar Mitra Oasis</h1>
+            <p class="text-slate-500 text-sm">Mulai kelola bisnis Anda secara otomatis hari ini.</p>
+        </div>
+
+        <form id="regForm" class="space-y-4">
+            <div>
+                <label class="block text-sm font-semibold text-slate-700 mb-1">ID Bisnis (Tanpa Spasi)</label>
+                <input type="text" id="bizId" placeholder="contoh: mawar-salon" required
+                    class="w-full border border-slate-200 p-3 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none">
+            </div>
+            <div>
+                <label class="block text-sm font-semibold text-slate-700 mb-1">Nama Bisnis/Spa</label>
+                <input type="text" id="bizName" placeholder="Mawar Spa & Reflexology" required
+                    class="w-full border border-slate-200 p-3 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none">
+            </div>
+            <div>
+                <label class="block text-sm font-semibold text-slate-700 mb-1">Token Fonnte (Opsional)</label>
+                <input type="text" id="waToken" placeholder="Masukkan token WA Anda"
+                    class="w-full border border-slate-200 p-3 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none">
+            </div>
+            <div>
+                <label class="block text-sm font-semibold text-slate-700 mb-1">Password Admin Dashboard</label>
+                <input type="password" id="adminPass" placeholder="••••••••" required
+                    class="w-full border border-slate-200 p-3 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none">
+            </div>
+
+            <button type="submit" id="btnSubmit"
+                class="w-full bg-emerald-600 text-white font-bold py-4 rounded-xl hover:bg-emerald-700 transition-all shadow-lg shadow-emerald-200">
+                Aktifkan Dashboard Saya
+            </button>
+        </form>
+
+        <div id="successMsg" class="hidden mt-6 p-4 bg-emerald-100 text-emerald-700 rounded-xl text-center">
+            <p class="font-bold">Pendaftaran Berhasil!</p>
+            <p class="text-sm mt-1">Gunakan ID Bisnis Anda untuk login di dashboard admin.</p>
+        </div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = "https://oivvcaeqfyssnphvtojg.supabase.co";
+        const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9pdnZjYWVxZnlzc25waHZ0b2pnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE0NTk3NDAsImV4cCI6MjA4NzAzNTc0MH0.cG0WG5_TWu7ivdNVkz4BlGyugHwHIKRlQS50e9iXKwo";
+        const client = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        document.getElementById('regForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('btnSubmit');
+            btn.innerText = "Memproses...";
+            btn.disabled = true;
+
+            const bizData = {
+                id: document.getElementById('bizId').value.toLowerCase().replace(/\s+/g, '-'),
+                business_name: document.getElementById('bizName').value,
+                wa_token: document.getElementById('waToken').value,
+                admin_password: document.getElementById('adminPass').value
+            };
+
+            const { error } = await client.from('businesses').insert([bizData]);
+
+            if (error) {
+                alert("Gagal daftar: " + error.message);
+                btn.innerText = "Aktifkan Dashboard Saya";
+                btn.disabled = false;
+            } else {
+                document.getElementById('regForm').classList.add('hidden');
+                document.getElementById('successMsg').classList.remove('hidden');
+                
+                // Redirect otomatis ke admin setelah 3 detik
+                setTimeout(() => {
+                    window.location.href = "admin.html";
+                }, 3000);
+            }
+        });
+    </script>
+</body>
+</html>
