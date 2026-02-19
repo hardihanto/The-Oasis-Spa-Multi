@@ -2,78 +2,63 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Daftar Mitra - SaaS Booking</title>
+    <title>Pendaftaran Bisnis Baru</title>
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-slate-50 flex items-center justify-center min-h-screen p-4">
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
 
-    <div class="bg-white p-8 rounded-3xl shadow-xl max-w-md w-full border border-slate-100">
-        <div class="text-center mb-8">
-            <h1 class="text-3xl font-extrabold text-slate-800">Daftarkan Bisnis</h1>
-            <p class="text-slate-500 mt-2">Mulai kelola reservasi Anda secara digital</p>
-        </div>
-
-        <form id="regForm" class="space-y-4">
-            <div>
-                <label class="block text-sm font-bold text-slate-700 mb-1">ID Bisnis (Tanpa Spasi)</label>
-                <input type="text" id="bizId" placeholder="contoh: mawar-salon" required
-                    class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 outline-none transition">
-            </div>
-            <div>
-                <label class="block text-sm font-bold text-slate-700 mb-1">Nama Bisnis</label>
-                <input type="text" id="bizName" placeholder="Mawar Salon & Spa" required
-                    class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 outline-none transition">
-            </div>
-            <div>
-                <label class="block text-sm font-bold text-slate-700 mb-1">Password Admin</label>
-                <input type="password" id="adminPass" placeholder="••••••••" required
-                    class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 outline-none transition">
-            </div>
-            <div>
-                <label class="block text-sm font-bold text-slate-700 mb-1">Token Fonnte (Opsional)</label>
-                <input type="text" id="waToken" placeholder="Token WhatsApp"
-                    class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 outline-none transition">
-            </div>
-
-            <button type="submit" id="btnSubmit"
-                class="w-full bg-blue-600 text-white font-bold py-4 rounded-xl hover:bg-blue-700 transition shadow-lg shadow-blue-200 active:scale-95">
-                Aktifkan Dashboard Saya
+    <div class="bg-white p-8 rounded-lg shadow-md w-full max-w-md text-center">
+        <h2 class="text-2xl font-bold mb-6">Daftarkan Toko Anda</h2>
+        
+        <div class="space-y-4">
+            <input type="text" id="bizId" placeholder="ID Bisnis (contoh: oasis-spa)" class="w-full border p-3 rounded">
+            <input type="text" id="bizName" placeholder="Nama Toko" class="w-full border p-3 rounded">
+            <input type="password" id="bizPass" placeholder="Password Admin" class="w-full border p-3 rounded">
+            <button onclick="simpanKeDatabase()" id="btnSubmit" class="w-full bg-blue-600 text-white p-3 rounded font-bold hover:bg-blue-700">
+                Daftar Sekarang
             </button>
-        </form>
+        </div>
+        
+        <p id="msg" class="mt-4 text-sm font-medium"></p>
     </div>
 
     <script>
-        const SB_URL = "https://oivvcaeqfyssnphvtojg.supabase.co";
-        const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9pdnZjYWVxZnlzc25waHZ0b2pnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE0NTk3NDAsImV4cCI6MjA4NzAzNTc0MH0.cG0WG5_TWu7ivdNVkz4BlGyugHwHIKRlQS50e9iXKwo";
-        const sb = supabase.createClient(SB_URL, SB_KEY);
+        // KREDENSIAL (Pastikan URL & KEY Anda Benar)
+        const URL = "https://oivvcaeqfyssnphvtojg.supabase.co";
+        const KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9pdnZjYWVxZnlzc25waHZ0b2pnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE0NTk3NDAsImV4cCI6MjA4NzAzNTc0MH0.cG0WG5_TWu7ivdNVkz4BlGyugHwHIKRlQS50e9iXKwo";
+        
+        const sb = supabase.createClient(URL, KEY);
 
-        document.getElementById('regForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const btn = document.getElementById('btnSubmit');
-            btn.innerText = "Mendaftarkan...";
-            btn.disabled = true;
+        async function simpanKeDatabase() {
+            const id = document.getElementById('bizId').value.trim().toLowerCase();
+            const nama = document.getElementById('bizName').value.trim();
+            const pass = document.getElementById('bizPass').value.trim();
+            const msg = document.getElementById('msg');
 
-           // Ganti bagian bizData di register.html Anda dengan ini
-const bizData = {
-    id: String(document.getElementById('bizId').value).trim().toLowerCase(),
-    business_name: String(document.getElementById('bizName').value).trim(),
-    admin_password: String(document.getElementById('adminPass').value).trim(),
-    wa_token: String(document.getElementById('waToken').value).trim()
-};
+            if (!id || !nama || !pass) return alert("Semua kolom harus diisi!");
 
-            const { error } = await sb.from('businesses').insert([bizData]);
+            msg.innerText = "Mencoba menghubungi database...";
+            msg.className = "mt-4 text-blue-500";
+
+            // PROSES INSERT
+            const { error } = await sb
+                .from('businesses')
+                .insert([{ 
+                    id: id, 
+                    business_name: nama, 
+                    admin_password: pass 
+                }]);
 
             if (error) {
-                alert("Gagal: " + error.message);
-                btn.innerText = "Aktifkan Dashboard Saya";
-                btn.disabled = false;
+                console.error(error);
+                msg.innerText = "GAGAL: " + error.message;
+                msg.className = "mt-4 text-red-500";
             } else {
-                alert("Berhasil Terdaftar! Anda sekarang bisa login.");
-                window.location.href = "admin.html"; // Arahkan ke dashboard
+                msg.innerText = "BERHASIL! Toko " + nama + " terdaftar.";
+                msg.className = "mt-4 text-green-500";
             }
-        });
+        }
     </script>
 </body>
 </html>
