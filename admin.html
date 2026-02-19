@@ -47,26 +47,46 @@
 
         let dataToko = null;
 
-        async function prosesLogin() {
-            const u = document.getElementById('user').value.trim().toLowerCase();
-            const p = document.getElementById('pass').value.trim();
-            const btn = document.getElementById('btnLog');
+       async function prosesLogin() {
+    const u = document.getElementById('user').value.trim().toLowerCase();
+    const p = document.getElementById('pass').value.trim();
+    const btn = document.getElementById('btnLog');
 
-            btn.innerText = "Mengecek...";
-            
-            const { data, error } = await sb.from('businesses').select('*').eq('id', u).eq('admin_password', p).maybeSingle();
+    btn.innerText = "Mencoba Koneksi...";
+    console.log("Memulai pencarian untuk ID:", u);
 
-            if (data) {
-                dataToko = data;
-                document.getElementById('loginBox').classList.add('hidden');
-                document.getElementById('dashboard').classList.remove('hidden');
-                document.getElementById('namaToko').innerText = data.business_name;
-                ambilBooking();
-            } else {
-                alert("ID atau Password Salah!");
-                btn.innerText = "Masuk Sekarang";
-            }
+    try {
+        const { data, error } = await sb
+            .from('businesses')
+            .select('*')
+            .eq('id', u)
+            .eq('admin_password', p)
+            .maybeSingle();
+
+        if (error) {
+            console.error("Kesalahan Supabase:", error.message);
+            alert("Gagal konek ke database: " + error.message);
+            btn.innerText = "Masuk Sekarang";
+            return;
         }
+
+        if (data) {
+            console.log("Login Berhasil!");
+            dataToko = data;
+            document.getElementById('loginBox').classList.add('hidden');
+            document.getElementById('dashboard').classList.remove('hidden');
+            document.getElementById('namaToko').innerText = data.business_name;
+            ambilBooking();
+        } else {
+            alert("ID atau Password Salah (Data tidak ditemukan)");
+            btn.innerText = "Masuk Sekarang";
+        }
+    } catch (err) {
+        console.error("Fatal Error:", err);
+        alert("Koneksi internet bermasalah atau URL Supabase salah.");
+        btn.innerText = "Masuk Sekarang";
+    }
+}
 
         async function ambilBooking() {
             const { data, error } = await sb.from('bookings').select('*').eq('business_id', dataToko.id);
