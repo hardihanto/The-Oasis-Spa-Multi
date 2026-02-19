@@ -2,44 +2,75 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>Super Admin Panel - SaaSBOOK</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Super Admin - Revenue Tracker</title>
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .glass-card { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.1); }
+    </style>
 </head>
-<body class="bg-slate-900 min-h-screen text-slate-100 font-sans">
+<body class="bg-[#0f172a] text-slate-200 min-h-screen">
 
-    <div id="loginArea" class="flex items-center justify-center min-h-screen">
-        <div class="bg-slate-800 p-8 rounded-[2rem] shadow-2xl w-full max-w-sm border border-slate-700">
-            <h1 class="text-2xl font-black text-center mb-6 text-emerald-400 italic">SUPER ADMIN</h1>
-            <input type="text" id="user" placeholder="Username" class="w-full p-4 mb-4 rounded-2xl bg-slate-900 border-none outline-none focus:ring-2 focus:ring-emerald-500">
-            <input type="password" id="pass" placeholder="Password" class="w-full p-4 mb-6 rounded-2xl bg-slate-900 border-none outline-none focus:ring-2 focus:ring-emerald-500">
-            <button onclick="login()" class="w-full bg-emerald-500 text-slate-900 font-black py-4 rounded-2xl hover:bg-emerald-400 transition">MASUK SYSTEM</button>
+    <div id="loginArea" class="flex items-center justify-center min-h-screen p-6">
+        <div class="glass-card p-10 rounded-[2.5rem] w-full max-w-sm shadow-2xl">
+            <div class="text-center mb-8">
+                <span class="text-4xl">👑</span>
+                <h1 class="text-2xl font-extrabold text-emerald-400 mt-2">Owner Panel</h1>
+            </div>
+            <div class="space-y-4">
+                <input type="text" id="user" placeholder="Admin ID" class="w-full bg-slate-900/50 p-4 rounded-2xl outline-none focus:ring-2 focus:ring-emerald-500 transition">
+                <input type="password" id="pass" placeholder="Password" class="w-full bg-slate-900/50 p-4 rounded-2xl outline-none focus:ring-2 focus:ring-emerald-500 transition">
+                <button onclick="login()" class="w-full bg-emerald-500 text-slate-900 font-extrabold py-4 rounded-2xl hover:bg-emerald-400 transition shadow-lg shadow-emerald-500/20">MASUK</button>
+            </div>
         </div>
     </div>
 
-    <div id="mainArea" class="hidden p-6 md:p-12 animate-in fade-in duration-500">
-        <div class="max-w-6xl mx-auto">
-            <div class="flex justify-between items-end mb-10">
+    <div id="mainArea" class="hidden p-4 md:p-10">
+        <div class="max-w-7xl mx-auto">
+            
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4">
                 <div>
-                    <h2 class="text-4xl font-black tracking-tighter">Manajemen Lisensi</h2>
-                    <p class="text-slate-400">Approve pendaftar baru yang sudah membayar 500rb.</p>
+                    <h1 class="text-4xl font-extrabold tracking-tighter text-white italic">Finance <span class="text-emerald-400">Overview.</span></h1>
+                    <p class="text-slate-400 text-sm">Rekapitulasi lisensi Rp 500.000 / tahun</p>
                 </div>
-                <button onclick="location.reload()" class="bg-slate-800 px-6 py-2 rounded-xl text-xs font-bold uppercase tracking-widest border border-slate-700">Logout</button>
+                <button onclick="location.reload()" class="bg-slate-800 hover:bg-rose-500 text-white px-6 py-2 rounded-xl text-xs font-bold transition">LOGOUT</button>
             </div>
 
-            <div class="bg-slate-800 rounded-[2.5rem] border border-slate-700 overflow-hidden shadow-2xl">
-                <table class="w-full text-left">
-                    <thead class="bg-slate-900/50 text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500">
-                        <tr>
-                            <th class="p-6">Nama Bisnis / ID</th>
-                            <th class="p-6">Kontak Owner</th>
-                            <th class="p-6">Status Lisensi</th>
-                            <th class="p-6 text-right">Aksi Approval</th>
-                        </tr>
-                    </thead>
-                    <tbody id="listToko" class="divide-y divide-slate-700">
-                        </tbody>
-                </table>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div class="glass-card p-8 rounded-[2rem] relative overflow-hidden">
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Total Penghasilan</p>
+                    <h3 id="revTotal" class="text-4xl font-extrabold mt-2 text-emerald-400 font-mono">Rp 0</h3>
+                    <div class="absolute -right-4 -bottom-4 opacity-10 text-6xl">💰</div>
+                </div>
+                <div class="glass-card p-8 rounded-[2rem]">
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Lisensi Aktif</p>
+                    <h3 id="activeCount" class="text-4xl font-extrabold mt-2 text-white">0</h3>
+                </div>
+                <div class="glass-card p-8 rounded-[2rem]">
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Menunggu Bayar</p>
+                    <h3 id="pendingCount" class="text-4xl font-extrabold mt-2 text-amber-500 font-mono">0</h3>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                
+                <div class="lg:col-span-2 glass-card p-8 rounded-[2.5rem]">
+                    <h4 class="font-bold mb-6 text-slate-400 uppercase text-xs tracking-widest italic">Pertumbuhan Mitra</h4>
+                    <canvas id="growthChart" height="150"></canvas>
+                </div>
+
+                <div class="glass-card rounded-[2.5rem] overflow-hidden">
+                    <div class="p-6 border-b border-white/5">
+                        <h4 class="font-bold text-slate-400 uppercase text-xs tracking-widest italic">Aktivasi Cepat</h4>
+                    </div>
+                    <div id="listMitra" class="divide-y divide-white/5 max-h-[400px] overflow-y-auto">
+                        </div>
+                </div>
+
             </div>
         </div>
     </div>
@@ -52,59 +83,95 @@
         async function login() {
             const u = document.getElementById('user').value;
             const p = document.getElementById('pass').value;
-            
             const { data } = await sb.from('super_admins').select('*').eq('username', u).eq('password', p).maybeSingle();
 
             if (data) {
                 document.getElementById('loginArea').classList.add('hidden');
                 document.getElementById('mainArea').classList.remove('hidden');
-                loadMitra();
+                loadDashboardData();
             } else { alert("Akses Ditolak!"); }
         }
 
-        async function loadMitra() {
-            const { data } = await sb.from('businesses').select('*').order('created_at', {ascending: false});
-            const list = document.getElementById('listToko');
+        async function loadDashboardData() {
+            const { data: businesses } = await sb.from('businesses').select('*').order('created_at', { ascending: true });
+            
+            const active = businesses.filter(b => b.is_active);
+            const pending = businesses.filter(b => !b.is_active);
+
+            // 1. Update Rekap Penghasilan
+            const totalRevenue = active.length * 500000;
+            document.getElementById('revTotal').innerText = "Rp " + totalRevenue.toLocaleString('id-ID');
+            document.getElementById('activeCount').innerText = active.length;
+            document.getElementById('pendingCount').innerText = pending.length;
+
+            // 2. Tampilkan Daftar Mitra di Sidebar
+            const list = document.getElementById('listMitra');
             list.innerHTML = "";
-
-            data.forEach(toko => {
-                const status = toko.is_active 
-                    ? `<span class="bg-emerald-500/10 text-emerald-500 px-3 py-1 rounded-full text-[10px] font-bold uppercase">AKTIF</span>`
-                    : `<span class="bg-amber-500/10 text-amber-500 px-3 py-1 rounded-full text-[10px] font-bold uppercase">PENDING</span>`;
-
-                const btn = toko.is_active
-                    ? `<button onclick="toggleAktivasi('${toko.id}', false)" class="text-[10px] font-bold text-rose-500 hover:underline">Non-aktifkan</button>`
-                    : `<button onclick="toggleAktivasi('${toko.id}', true)" class="bg-emerald-500 text-slate-900 px-6 py-2 rounded-xl text-[10px] font-black uppercase hover:bg-emerald-400 transition">APPROVE & AKTIFKAN</button>`;
-
+            businesses.forEach(toko => {
+                const statusColor = toko.is_active ? 'bg-emerald-500' : 'bg-amber-500';
                 list.innerHTML += `
-                    <tr class="hover:bg-slate-700/30 transition">
-                        <td class="p-6">
-                            <p class="font-bold text-lg">${toko.business_name}</p>
-                            <p class="text-xs text-slate-500 font-mono">${toko.id}</p>
-                        </td>
-                        <td class="p-6">
-                            <p class="text-sm font-medium">${toko.owner_wa}</p>
-                            <a href="https://wa.me/${toko.owner_wa}" target="_blank" class="text-[10px] text-emerald-400 hover:underline">Chat WhatsApp</a>
-                        </td>
-                        <td class="p-6">${status}</td>
-                        <td class="p-6 text-right">${btn}</td>
-                    </tr>
+                    <div class="p-5 hover:bg-white/5 transition group">
+                        <div class="flex justify-between items-start mb-2">
+                            <div>
+                                <p class="font-bold text-white text-sm">${toko.business_name}</p>
+                                <p class="text-[10px] text-slate-500">${toko.owner_wa}</p>
+                            </div>
+                            <span class="w-2 h-2 rounded-full ${statusColor}"></span>
+                        </div>
+                        <button onclick="toggleAktivasi('${toko.id}', ${!toko.is_active})" 
+                            class="w-full mt-2 py-2 rounded-lg border border-white/10 text-[10px] font-bold uppercase tracking-widest group-hover:bg-emerald-500 group-hover:text-slate-900 transition-all">
+                            ${toko.is_active ? 'Cabut Lisensi' : 'Aktivasi Lisensi'}
+                        </button>
+                    </div>
                 `;
+            });
+
+            // 3. Render Grafik Pertumbuhan (Monthly)
+            renderChart(businesses);
+        }
+
+        function renderChart(data) {
+            const ctx = document.getElementById('growthChart').getContext('2d');
+            
+            // Mengelompokkan data berdasarkan bulan
+            const months = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agt", "Sep", "Okt", "Nov", "Des"];
+            const monthlyCounts = new Array(12).fill(0);
+
+            data.forEach(item => {
+                const monthIndex = new Date(item.created_at).getMonth();
+                monthlyCounts[monthIndex]++;
+            });
+
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: months,
+                    datasets: [{
+                        label: 'Pendaftaran Baru',
+                        data: monthlyCounts,
+                        borderColor: '#10b981',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        fill: true,
+                        tension: 0.4,
+                        borderWidth: 3,
+                        pointRadius: 5,
+                        pointBackgroundColor: '#10b981'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#64748b' } },
+                        x: { grid: { display: false }, ticks: { color: '#64748b' } }
+                    }
+                }
             });
         }
 
         async function toggleAktivasi(id, status) {
-            const confirmMsg = status ? "Aktifkan lisensi toko ini?" : "Matikan akses toko ini?";
-            if(!confirm(confirmMsg)) return;
-
             const { error } = await sb.from('businesses').update({ is_active: status }).eq('id', id);
-            
-            if(!error) {
-                alert(status ? "Lisensi Berhasil Diaktifkan!" : "Akses Dicabut.");
-                loadMitra();
-            } else {
-                alert("Error: " + error.message);
-            }
+            if(!error) loadDashboardData();
         }
     </script>
 </body>
