@@ -10,62 +10,17 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;800&display=swap');
-        
-        :root {
-            --slate-950: #020617;
-            --emerald-500: #10b981;
-        }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--slate-950);
-            color: #e2e8f0;
-            background-image: 
-                radial-gradient(circle at 2px 2px, rgba(255,255,255,0.05) 1px, transparent 0);
-            background-size: 40px 40px;
-        }
-
+        :root { --slate-950: #020617; --emerald-500: #10b981; }
+        body { font-family: 'Inter', sans-serif; background-color: var(--slate-950); color: #e2e8f0; background-image: radial-gradient(circle at 2px 2px, rgba(255,255,255,0.05) 1px, transparent 0); background-size: 40px 40px; }
         .code-font { font-family: 'JetBrains Mono', monospace; }
-
-        .console-card {
-            background: rgba(15, 23, 42, 0.8);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 0 40px rgba(0,0,0,0.5);
-            backdrop-filter: blur(10px);
-        }
-
-        .input-terminal {
-            background: #0f172a;
-            border: 1px solid #1e293b;
-            transition: all 0.2s ease;
-        }
-
-        .input-terminal:focus {
-            border-color: var(--emerald-500);
-            background: #020617;
-            outline: none;
-            box-shadow: 0 0 0 1px var(--emerald-500);
-        }
-
-        .status-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            display: inline-block;
-            margin-right: 8px;
-        }
-
-        /* Custom SweetAlert Dark Theme */
-        .swal2-popup {
-            background: #0f172a !important;
-            color: #fff !important;
-            border: 1px solid rgba(255,255,255,0.1) !important;
-            border-radius: 20px !important;
-        }
+        .console-card { background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(255, 255, 255, 0.1); box-shadow: 0 0 40px rgba(0,0,0,0.5); backdrop-filter: blur(10px); }
+        .input-terminal { background: #0f172a; border: 1px solid #1e293b; transition: all 0.2s ease; }
+        .input-terminal:focus { border-color: var(--emerald-500); background: #020617; outline: none; box-shadow: 0 0 0 1px var(--emerald-500); }
+        .status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 8px; }
+        .swal2-popup { background: #0f172a !important; color: #fff !important; border: 1px solid rgba(255,255,255,0.1) !important; border-radius: 20px !important; }
     </style>
 </head>
 <body class="min-h-screen flex items-center justify-center p-6">
-
     <div class="console-card w-full max-w-3xl rounded-xl overflow-hidden">
         <div class="bg-[#1e293b] px-6 py-3 flex justify-between items-center border-b border-white/5">
             <div class="flex gap-2">
@@ -73,44 +28,34 @@
                 <div class="w-3 h-3 rounded-full bg-[#ffbd2e]"></div>
                 <div class="w-3 h-3 rounded-full bg-[#27c93f]"></div>
             </div>
-            <div class="text-[10px] code-font tracking-widest text-slate-400 uppercase">
-                Terminal — Instance Deployment v4.0.0
-            </div>
+            <div class="text-[10px] code-font tracking-widest text-slate-400 uppercase">Terminal — Instance Deployment v4.0.0</div>
         </div>
 
         <div class="p-8 md:p-12">
             <div class="mb-10">
-                <h1 class="text-3xl font-extrabold tracking-tighter text-white mb-2 italic">
-                    Deploy New <span class="text-emerald-500">Instance.</span>
-                </h1>
+                <h1 class="text-3xl font-extrabold tracking-tighter text-white mb-2 italic">Deploy New <span class="text-emerald-500">Instance.</span></h1>
                 <p class="text-slate-500 text-sm code-font">Lengkapi parameter konfigurasi untuk inisialisasi database.</p>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-8">
-                
                 <div class="space-y-2">
                     <label class="text-[11px] code-font font-bold text-slate-500 uppercase tracking-widest">Instance Identifier (ID)</label>
-                    <div class="relative group">
-                        <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-600 text-xs code-font">ID:</span>
+                    <div class="relative group"><span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-600 text-xs code-font">ID:</span>
                         <input type="text" id="bizID" placeholder="unique-slug" class="input-terminal w-full pl-12 pr-4 py-4 rounded-lg text-sm code-font text-emerald-400">
                     </div>
                 </div>
-
                 <div class="space-y-2">
                     <label class="text-[11px] code-font font-bold text-slate-500 uppercase tracking-widest">Enterprise Name</label>
                     <input type="text" id="bizName" placeholder="Nama Brand Bisnis" class="input-terminal w-full px-4 py-4 rounded-lg text-sm">
                 </div>
-
                 <div class="space-y-2">
                     <label class="text-[11px] code-font font-bold text-slate-500 uppercase tracking-widest">Comm Line (WhatsApp)</label>
                     <input type="number" id="bizWA" placeholder="628123456789" class="input-terminal w-full px-4 py-4 rounded-lg text-sm code-font">
                 </div>
-
                 <div class="space-y-2">
                     <label class="text-[11px] code-font font-bold text-slate-500 uppercase tracking-widest">Root Credential (Pass)</label>
                     <input type="password" id="bizPass" placeholder="••••••••" class="input-terminal w-full px-4 py-4 rounded-lg text-sm">
                 </div>
-
             </div>
 
             <div class="mt-12 pt-8 border-t border-white/5 flex flex-col md:flex-row items-center justify-between gap-6">
@@ -118,10 +63,8 @@
                     <p><span class="status-dot bg-emerald-500 animate-pulse"></span> DB CLUSTER: ONLINE</p>
                     <p><span class="status-dot bg-blue-500"></span> PROTOCOL: SUPABASE_REST_V2</p>
                 </div>
-
                 <button onclick="deploy()" id="btnReg" class="w-full md:w-auto bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold px-10 py-4 rounded-lg transition-all flex items-center justify-center gap-3 active:scale-95 shadow-lg shadow-emerald-500/20">
-                    <span class="tracking-widest text-sm">RUN DEPLOYMENT</span>
-                    <i class="fa-solid fa-terminal text-xs"></i>
+                    <span class="tracking-widest text-sm text-slate-900">RUN DEPLOYMENT</span><i class="fa-solid fa-terminal text-xs"></i>
                 </button>
             </div>
         </div>
@@ -135,85 +78,39 @@
 
         async function deploy() {
             const btn = document.getElementById('btnReg');
-            
-            // Data Extraction & Sanitization
             const bizID = document.getElementById('bizID').value.toLowerCase().trim().replace(/\s+/g, '-');
             const bizName = document.getElementById('bizName').value.trim();
             const bizPass = document.getElementById('bizPass').value;
             const bizWA = document.getElementById('bizWA').value.trim();
 
-            // Client-side Validation (No Error Popup)
             if (!bizID || !bizName || !bizPass || !bizWA) {
-                return Swal.fire({ icon: 'warning', title: 'Parameters Missing', text: 'Harap lengkapi seluruh konfigurasi instance.', confirmButtonColor: '#10b981' });
+                return Swal.fire({ icon: 'warning', title: 'Parameters Missing', text: 'Lengkapi seluruh konfigurasi.', confirmButtonColor: '#10b981' });
             }
 
-            btn.innerHTML = '<i class="fa-solid fa-sync fa-spin"></i> EXECUTING...';
+            btn.innerHTML = '<i class="fa-solid fa-sync fa-spin text-slate-900"></i> EXECUTING...';
             btn.disabled = true;
 
-            const payload = {
-                id: bizID,
-                business_name: bizName,
-                admin_password: bizPass,
-                owner_wa: bizWA,
-                is_active: false
-            };
-
             try {
-                // Supabase Operation
-                const { error } = await sb.from('businesses').insert([payload]);
-
+                const { error } = await sb.from('businesses').insert([{ id: bizID, business_name: bizName, admin_password: bizPass, owner_wa: bizWA, is_active: false }]);
                 if (error) {
-                    // Specific handling for duplicate ID without raw error logs
                     if (error.code === '23505') throw new Error(`ID Instance '${bizID}' sudah digunakan.`);
                     throw error;
                 }
-
-                // WhatsApp Notification Trigger (Fire and forget)
                 sendAutoNotification(bizWA, bizName, bizID);
-
-                // Success Response
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Deployed Successfully',
-                    text: 'Data telah diamankan. Silakan cek WhatsApp untuk instruksi aktivasi.',
-                    confirmButtonColor: '#10b981'
-                }).then(() => window.location.reload());
-
+                Swal.fire({ icon: 'success', title: 'Deployed Successfully', text: 'Cek WhatsApp untuk instruksi aktivasi.', confirmButtonColor: '#10b981' }).then(() => window.location.reload());
             } catch (err) {
-                // "Silent" Error handling
-                Swal.fire({
-                    icon: 'info',
-                    title: 'System Notice',
-                    text: err.message || "Gagal sinkronisasi ke database cluster.",
-                    confirmButtonColor: '#3b82f6'
-                });
-                btn.innerHTML = '<span class="tracking-widest text-sm">RETRY DEPLOY</span> <i class="fa-solid fa-terminal text-xs"></i>';
+                Swal.fire({ icon: 'info', title: 'System Notice', text: err.message || "Gagal sinkronisasi database.", confirmButtonColor: '#3b82f6' });
+                btn.innerHTML = '<span class="tracking-widest text-sm text-slate-900">RETRY DEPLOY</span> <i class="fa-solid fa-terminal text-xs"></i>';
                 btn.disabled = false;
             }
         }
 
-        async function sendAutoNotification(targetNumber, name, id) {
-            let cleanNumber = targetNumber.toString().replace(/\D/g, '');
-            if (cleanNumber.startsWith('0')) cleanNumber = '62' + cleanNumber.slice(1);
-
-            const message = 
-                `Halo Admin *${name}*, 👋\n\n` +
-                `Pendaftaran instance *${id}* di SaaSBOOK telah berhasil.\n\n` +
-                `Silakan selesaikan aktivasi lisensi tahunan sebesar *Rp 500.000* ke:\n\n` +
-                `🏦 *Bank BCA*\n` +
-                `No. Rek: *5745452563*\n` +
-                `A.N: *Hardi Hanto*\n\n` +
-                `Kirim bukti transfer ke nomor ini untuk aktivasi instan. Terima kasih!`;
-
-            const formData = new FormData();
-            formData.append('target', cleanNumber);
-            formData.append('message', message);
-            
-            fetch('https://api.fonnte.com/send', {
-                method: 'POST',
-                headers: { 'Authorization': FONNTE_TOKEN },
-                body: formData
-            }).catch(e => console.error("Notification engine background delay."));
+        async function sendAutoNotification(target, name, id) {
+            let num = target.toString().replace(/\D/g, '');
+            if (num.startsWith('0')) num = '62' + num.slice(1);
+            const msg = `Halo Admin *${name}*, 👋\n\nPendaftaran instance *${id}* sukses.\n\nSilakan selesaikan aktivasi lisensi *Rp 500.000* ke:\n\n🏦 *Bank BCA*\nNo. Rek: *1234567890*\nA.N: *Admin SaaSBOOK*\n\nKirim bukti transfer untuk aktivasi instan.`;
+            const body = new FormData(); body.append('target', num); body.append('message', msg);
+            fetch('https://api.fonnte.com/send', { method: 'POST', headers: { 'Authorization': FONNTE_TOKEN }, body }).catch(() => {});
         }
     </script>
 </body>
