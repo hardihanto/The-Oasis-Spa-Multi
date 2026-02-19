@@ -117,38 +117,86 @@
         </div>
     </div>
 
-    <script>
-        const SB_URL = "https://strylleubkvuirsknqbk.supabase.co";
-        const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN0cnlsbGV1Ymt2dWlyc2tucWJrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE0ODM2OTksImV4cCI6MjA4NzA1OTY5OX0.sfnSvVgUoBRgwDyYY5VBAaHPHM_rPKBQ4a3w1ziKgUw";
-        const sb = supabase.createClient(SB_URL, SB_KEY);
+   <script>
+    const SB_URL = "https://strylleubkvuirsknqbk.supabase.co";
+    const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN0cnlsbGV1Ymt2dWlyc2tucWJrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE0ODM2OTksImV4cCI6MjA4NzA1OTY5OX0.sfnSvVgUoBRgwDyYY5VBAaHPHM_rPKBQ4a3w1ziKgUw";
+    const sb = supabase.createClient(SB_URL, SB_KEY);
+    
+    // Token Fonnte Anda
+    const FONNTE_TOKEN = "5dApyiRqU4nLdgaD1ncQ"; 
 
-        async function deploy() {
-            const btn = document.getElementById('btnReg');
-            const data = {
-                id: document.getElementById('bizID').value.toLowerCase().trim(),
-                business_name: document.getElementById('bizName').value,
-                admin_password: document.getElementById('bizPass').value,
-                owner_wa: document.getElementById('bizWA').value,
-                is_active: false
-            };
+    async function deploy() {
+        const btn = document.getElementById('btnReg');
+        const bizID = document.getElementById('bizID').value.toLowerCase().trim();
+        const bizName = document.getElementById('bizName').value;
+        const bizPass = document.getElementById('bizPass').value;
+        const bizWA = document.getElementById('bizWA').value;
 
-            if (Object.values(data).some(x => x === "")) return alert("Error: Null parameters detected.");
+        const data = {
+            id: bizID,
+            business_name: bizName,
+            admin_password: bizPass,
+            owner_wa: bizWA,
+            is_active: false
+        };
 
-            btn.innerHTML = '<i class="fa-solid fa-sync fa-spin"></i> EXECUTING...';
-            btn.disabled = true;
+        if (Object.values(data).some(x => x === "")) return alert("Error: Null parameters detected.");
 
-            const { error } = await sb.from('businesses').insert([data]);
+        btn.innerHTML = '<i class="fa-solid fa-sync fa-spin"></i> EXECUTING...';
+        btn.disabled = true;
 
-            if (error) {
-                alert("Runtime Error: " + error.message);
-                btn.innerHTML = 'RETRY DEPLOY';
-                btn.disabled = false;
-            } else {
-                btn.innerHTML = 'SUCCESSFULLY DEPLOYED';
-                btn.classList.replace('bg-emerald-500', 'bg-blue-500');
-                setTimeout(() => window.location.reload(), 2000);
-            }
+        // 1. Simpan ke Supabase
+        const { error } = await sb.from('businesses').insert([data]);
+
+        if (error) {
+            alert("Runtime Error: " + error.message);
+            btn.innerHTML = 'RETRY DEPLOY';
+            btn.disabled = false;
+        } else {
+            // 2. Kirim Notifikasi Otomatis via Fonnte
+            await sendAutoNotification(bizWA, bizName, bizID);
+            
+            btn.innerHTML = 'SUCCESSFULLY DEPLOYED';
+            btn.classList.replace('bg-emerald-500', 'bg-blue-500');
+            
+            alert("✅ Registrasi Berhasil!\nInstruksi pembayaran telah dikirim ke WhatsApp Anda.");
+            setTimeout(() => window.location.reload(), 2000);
         }
-    </script>
+    }
+
+    async function sendAutoNotification(targetNumber, name, id) {
+        // Formating nomor ke standar internasional
+        let cleanNumber = targetNumber.toString().replace(/\D/g, '');
+        if (cleanNumber.startsWith('0')) cleanNumber = '62' + cleanNumber.slice(1);
+
+        const message = 
+            `Halo Bapak/Ibu dari *${name}*, 👋\n\n` +
+            `Terima kasih telah melakukan pendaftaran di *SaaSBOOK*. Instance Anda dengan ID: *${id}* telah berhasil dikonfigurasi di sistem kami.\n\n` +
+            `Untuk mengaktifkan dashboard dan mulai menggunakan layanan secara penuh, silakan lakukan aktivasi lisensi tahunan sebesar:\n\n` +
+            `*💰 Rp 500.000 / Tahun*\n\n` +
+            `Pembayaran dapat dilakukan melalui transfer ke:\n` +
+            `🏦 *Bank Central Asia (BCA)*\n` +
+            `No. Rekening: *1234567890*\n` +
+            `Atas Nama: *Admin SaaSBOOK*\n\n` +
+            `Jika sudah melakukan transfer, silakan kirimkan bukti bayar dengan membalas pesan ini agar admin dapat melakukan aktivasi instan.\n\n` +
+            `Terima kasih atas kepercayaan Anda menggunakan SaaSBOOK. 😊`;
+
+        const formData = new FormData();
+        formData.append('target', cleanNumber);
+        formData.append('message', message);
+        formData.append('delay', '2');
+
+        try {
+            await fetch('https://api.fonnte.com/send', {
+                method: 'POST',
+                headers: { 'Authorization': FONNTE_TOKEN },
+                body: formData
+            });
+            console.log("Notification engine triggered.");
+        } catch (err) {
+            console.error("Failed to send auto-notification:", err);
+        }
+    }
+</script>
 </body>
 </html>
