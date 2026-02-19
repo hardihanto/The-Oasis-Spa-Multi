@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Super Admin - SaaSBOOK Finance</title>
+    <title>Super Admin - SaaSBOOK Revenue & Follow Up</title>
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -24,49 +24,54 @@
                 <h1 class="text-2xl font-extrabold text-emerald-400 mt-2">Owner Panel</h1>
             </div>
             <div class="space-y-4">
-                <input type="text" id="user" placeholder="Username" class="w-full bg-slate-900/50 p-4 rounded-2xl outline-none focus:ring-2 focus:ring-emerald-500 transition border border-white/5 text-white">
+                <input type="text" id="user" placeholder="Admin ID" class="w-full bg-slate-900/50 p-4 rounded-2xl outline-none focus:ring-2 focus:ring-emerald-500 transition border border-white/5 text-white">
                 <input type="password" id="pass" placeholder="Password" class="w-full bg-slate-900/50 p-4 rounded-2xl outline-none focus:ring-2 focus:ring-emerald-500 transition border border-white/5 text-white">
-                <button onclick="login()" id="btnLogin" class="w-full bg-emerald-500 text-slate-900 font-extrabold py-4 rounded-2xl hover:bg-emerald-400 transition shadow-lg shadow-emerald-500/20">MASUK</button>
+                <button onclick="login()" id="btnLogin" class="w-full bg-emerald-500 text-slate-900 font-extrabold py-4 rounded-2xl hover:bg-emerald-400 transition shadow-lg shadow-emerald-500/20 uppercase tracking-widest">Login</button>
             </div>
         </div>
     </div>
 
-    <div id="mainArea" class="hidden p-4 md:p-10">
+    <div id="mainArea" class="hidden p-4 md:p-10 animate-in fade-in duration-500">
         <div class="max-w-7xl mx-auto">
+            
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4">
                 <div>
                     <h1 class="text-4xl font-extrabold tracking-tighter text-white italic">Finance <span class="text-emerald-400">Overview.</span></h1>
-                    <p class="text-slate-400 text-sm italic">Direct Fonnte Integration (No Pop-up)</p>
+                    <p class="text-slate-400 text-sm">Dashboard Monitoring & Follow-up Pendaftar</p>
                 </div>
                 <button onclick="location.reload()" class="bg-slate-800 hover:bg-rose-500 text-white px-6 py-2 rounded-xl text-xs font-bold transition">LOGOUT</button>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                <div class="glass-card p-8 rounded-[2rem] border-l-4 border-emerald-500">
-                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Revenue</p>
+                <div class="glass-card p-8 rounded-[2rem] border-l-4 border-emerald-500 relative overflow-hidden">
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Total Revenue</p>
                     <h3 id="revTotal" class="text-4xl font-extrabold mt-2 text-emerald-400 font-mono">Rp 0</h3>
+                    <div class="absolute -right-4 -bottom-4 opacity-10 text-6xl">💰</div>
                 </div>
                 <div class="glass-card p-8 rounded-[2rem] border-l-4 border-white">
-                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Active Licenses</p>
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Lisensi Aktif</p>
                     <h3 id="activeCount" class="text-4xl font-extrabold mt-2 text-white font-mono">0</h3>
                 </div>
                 <div class="glass-card p-8 rounded-[2rem] border-l-4 border-amber-500">
-                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Pending Payment</p>
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Belum Bayar</p>
                     <h3 id="pendingCount" class="text-4xl font-extrabold mt-2 text-amber-500 font-mono">0</h3>
                 </div>
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 <div class="lg:col-span-2 glass-card p-8 rounded-[2.5rem]">
-                    <h4 class="font-bold mb-6 text-slate-400 uppercase text-xs tracking-widest italic">User Growth</h4>
-                    <div class="h-[300px]"><canvas id="growthChart"></canvas></div>
+                    <h4 class="font-bold mb-6 text-slate-400 uppercase text-xs tracking-widest italic text-center md:text-left">Statistik Pendaftaran</h4>
+                    <div class="h-[300px]">
+                        <canvas id="growthChart"></canvas>
+                    </div>
                 </div>
 
                 <div class="glass-card rounded-[2.5rem] overflow-hidden flex flex-col h-[500px]">
-                    <div class="p-6 border-b border-white/5 bg-white/5 font-black text-xs uppercase tracking-widest italic">
-                        Action Required
+                    <div class="p-6 border-b border-white/5 bg-white/5 font-black text-xs uppercase tracking-widest italic flex items-center gap-2 text-emerald-400">
+                        <span class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span> Daftar Mitra
                     </div>
-                    <div id="listMitra" class="divide-y divide-white/5 overflow-y-auto flex-1"></div>
+                    <div id="listMitra" class="divide-y divide-white/5 overflow-y-auto flex-1">
+                        </div>
                 </div>
             </div>
         </div>
@@ -77,7 +82,7 @@
         const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN0cnlsbGV1Ymt2dWlyc2tucWJrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE0ODM2OTksImV4cCI6MjA4NzA1OTY5OX0.sfnSvVgUoBRgwDyYY5VBAaHPHM_rPKBQ4a3w1ziKgUw";
         const sb = supabase.createClient(SB_URL, SB_KEY);
         
-        // GANTI INI DENGAN TOKEN DARI TOMBOL HITAM 'TOKEN' DI SCREENSHOT ANDA
+        // TOKEN FONNTE TERVERIFIKASI
         const DEV_WA_TOKEN = "5dApyiRqU4nLdgaD1ncQ"; 
 
         async function login() {
@@ -88,11 +93,13 @@
                 document.getElementById('loginArea').classList.add('hidden');
                 document.getElementById('mainArea').classList.remove('hidden');
                 loadDashboardData();
-            } else { alert("Akses Ditolak!"); }
+            } else { alert("Akses Ditolak! Cek kembali User/Pass."); }
         }
 
         async function loadDashboardData() {
-            const { data: businesses } = await sb.from('businesses').select('*').order('created_at', { ascending: false });
+            const { data: businesses, error } = await sb.from('businesses').select('*').order('created_at', { ascending: false });
+            if(error) return console.error(error);
+
             const active = businesses.filter(b => b.is_active);
             const pending = businesses.filter(b => !b.is_active);
 
@@ -109,16 +116,19 @@
                     <div class="p-6 hover:bg-white/5 transition border-l-4 ${toko.is_active ? 'border-emerald-500' : 'border-amber-500'}">
                         <div class="flex justify-between items-start mb-2">
                             <div>
-                                <p class="font-bold text-white text-sm italic">${toko.business_name}</p>
-                                <p class="text-[10px] text-slate-500 font-mono tracking-tighter">${toko.owner_wa}</p>
+                                <p class="font-bold text-white text-sm">${toko.business_name}</p>
+                                <p class="text-[10px] text-slate-500 font-mono italic">${toko.owner_wa}</p>
                             </div>
+                            <span class="text-[9px] font-black uppercase px-2 py-1 rounded bg-slate-900 ${toko.is_active ? 'text-emerald-500' : 'text-amber-500'}">
+                                ${toko.is_active ? 'Aktif' : 'Pending'}
+                            </span>
                         </div>
                         <div class="grid grid-cols-2 gap-2 mt-4">
                             ${isPending ? `
-                                <button onclick="followUp('${toko.owner_wa}', '${toko.business_name}', this)" class="bg-amber-500 text-slate-900 py-2 rounded-xl text-[9px] font-bold uppercase hover:bg-amber-400 transition">Kirim WA</button>
-                                <button onclick="toggleAktivasi('${toko.id}', true)" class="bg-emerald-500 text-slate-900 py-2 rounded-xl text-[9px] font-black uppercase hover:bg-emerald-400 transition">Approve</button>
+                                <button onclick="followUp('${toko.owner_wa}', '${toko.business_name}', this)" class="bg-amber-500 text-slate-900 py-2 rounded-xl text-[9px] font-bold uppercase hover:bg-amber-400 transition">Follow Up</button>
+                                <button onclick="toggleAktivasi('${toko.id}', true)" class="bg-emerald-500 text-slate-900 py-2 rounded-xl text-[9px] font-black uppercase hover:bg-emerald-400 transition">Aktifkan</button>
                             ` : `
-                                <button onclick="toggleAktivasi('${toko.id}', false)" class="col-span-2 bg-slate-800 text-slate-400 py-2 rounded-xl text-[9px] font-bold uppercase border border-white/5">Deactivate</button>
+                                <button onclick="toggleAktivasi('${toko.id}', false)" class="col-span-2 bg-slate-800 text-slate-400 py-2 rounded-xl text-[9px] font-bold uppercase hover:bg-rose-500 hover:text-white transition">Matikan Lisensi</button>
                             `}
                         </div>
                     </div>
@@ -129,43 +139,40 @@
 
         async function followUp(wa, namaToko, btn) {
             const originalText = btn.innerText;
-            btn.innerText = "WAIT...";
+            btn.innerText = "SENDING...";
             btn.disabled = true;
 
             let cleanWa = wa.toString().replace(/\D/g, ''); 
             if (cleanWa.startsWith('0')) cleanWa = '62' + cleanWa.slice(1);
+            if (cleanWa.startsWith('8')) cleanWa = '62' + cleanWa;
 
             const pesan = `Halo kak! Kami dari SaaSBOOK Team. 👋\n\nKami melihat Anda telah mendaftarkan *${namaToko}* ke sistem kami. Saat ini status akun Anda masih Pending.\n\nJangan lewatkan kesempatan untuk mendigitalisasi reservasi Anda hanya dengan *Rp 500.000 / tahun*.\n\nApakah ada kendala dalam proses pembayaran? Kami siap membantu. 😊`;
             
-            // PENGIRIMAN MENGGUNAKAN URLSEARCHPARAMS (Sesuai dokumentasi Fonnte)
-            const data = new URLSearchParams();
-            data.append('target', cleanWa);
-            data.append('message', pesan);
-            data.append('delay', '2'); // Delay penting agar tidak dianggap spam oleh WA
+            // Format Pengiriman Fonnte (Otomatis)
+            const params = new URLSearchParams();
+            params.append('target', cleanWa);
+            params.append('message', pesan);
+            params.append('delay', '2'); // Memberi jeda agar pengiriman stabil
 
             try {
-                // Fetch dengan mode 'no-cors' tidak disarankan karena kita butuh balasan JSON
-                // Gunakan pengiriman standar namun tangkap error dengan lebih baik
                 const response = await fetch('https://api.fonnte.com/send', {
                     method: 'POST',
-                    headers: { 
-                        'Authorization': DEV_WA_TOKEN
-                        // Jangan sertakan Content-Type jika menggunakan URLSearchParams, browser akan mengaturnya
-                    },
-                    body: data
+                    headers: { 'Authorization': DEV_WA_TOKEN },
+                    body: params
                 });
                 
                 const result = await response.json();
+                console.log("Fonnte Status:", result);
 
                 if(result.status === true) {
-                    alert("✅ OTOMATIS: Pesan terkirim ke " + cleanWa);
+                    alert("✅ Berhasil! Pesan terkirim secara otomatis melalui Fonnte.");
                 } else {
-                    console.warn("Fonnte reject:", result.reason);
-                    throw new Error(result.reason);
+                    throw new Error(result.reason || "Server Reject");
                 }
             } catch (err) {
-                console.log("Fallback to WA Web because:", err.message);
-                // Jika error CORS atau API Limit, buka WA Web sebagai solusi terakhir
+                console.error("API Error:", err);
+                // Fallback jika API terputus/limit
+                alert("⚠️ Sistem mengalihkan ke WhatsApp Web untuk pengiriman manual.");
                 window.open(`https://api.whatsapp.com/send?phone=${cleanWa}&text=${encodeURIComponent(pesan)}`, '_blank');
             } finally {
                 btn.innerText = originalText;
@@ -174,23 +181,45 @@
         }
 
         async function toggleAktivasi(id, status) {
-            if(!confirm("Ubah status lisensi?")) return;
+            if(!confirm("Konfirmasi perubahan status lisensi?")) return;
             const { error } = await sb.from('businesses').update({ is_active: status }).eq('id', id);
             if(!error) loadDashboardData();
+            else alert("Gagal update database!");
         }
 
         function renderChart(data) {
             const ctx = document.getElementById('growthChart').getContext('2d');
             const monthlyCounts = new Array(12).fill(0);
-            data.forEach(item => monthlyCounts[new Date(item.created_at).getMonth()]++);
+            data.forEach(item => {
+                const d = new Date(item.created_at);
+                monthlyCounts[d.getMonth()]++;
+            });
+
             if (window.myChart) window.myChart.destroy();
             window.myChart = new Chart(ctx, {
                 type: 'line',
                 data: {
                     labels: ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agt", "Sep", "Okt", "Nov", "Des"],
-                    datasets: [{ data: monthlyCounts, borderColor: '#10b981', backgroundColor: 'rgba(16, 185, 129, 0.1)', fill: true, tension: 0.4 }]
+                    datasets: [{
+                        data: monthlyCounts,
+                        borderColor: '#10b981',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        fill: true,
+                        tension: 0.4,
+                        borderWidth: 3,
+                        pointRadius: 4,
+                        pointBackgroundColor: '#10b981'
+                    }]
                 },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#64748b', font: { size: 10 } } },
+                        x: { grid: { display: false }, ticks: { color: '#64748b', font: { size: 10 } } }
+                    }
+                }
             });
         }
     </script>
