@@ -3,46 +3,76 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard - SaaS Booking</title>
+    <title>SaaS Dashboard - Pro</title>
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .glass { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(12px); }
+        .loading-shimmer { background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; }
+        @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
+    </style>
 </head>
-<body class="bg-slate-50 min-h-screen font-sans text-slate-900">
+<body class="bg-[#fcfcfd] min-h-screen text-slate-900 font-sans">
 
-    <div id="loginSection" class="flex items-center justify-center min-h-screen p-4">
-        <div class="bg-white p-8 rounded-3xl shadow-xl w-full max-w-md border border-slate-200">
-            <h2 class="text-2xl font-bold text-center mb-6">Admin Login</h2>
+    <div id="loginArea" class="hidden flex items-center justify-center min-h-screen p-6">
+        <div class="bg-white p-10 rounded-[2.5rem] shadow-2xl shadow-slate-200 w-full max-w-md border border-slate-100">
+            <div class="text-center mb-10">
+                <div class="w-16 h-16 bg-emerald-500 rounded-2xl mx-auto flex items-center justify-center text-white text-3xl mb-4 shadow-lg shadow-emerald-200">💎</div>
+                <h2 class="text-2xl font-black">Portal Bisnis</h2>
+                <p class="text-slate-400 text-sm">Masuk untuk mengelola reservasi</p>
+            </div>
             <div class="space-y-4">
-                <input type="text" id="user" placeholder="ID Bisnis (assyifa-beauty-spa)" class="w-full border p-3 rounded-xl outline-none focus:ring-2 focus:ring-emerald-500 transition">
-                <input type="password" id="pass" placeholder="Password Admin" class="w-full border p-3 rounded-xl outline-none focus:ring-2 focus:ring-emerald-500 transition">
-                <button onclick="prosesLogin()" id="btnLog" class="w-full bg-slate-900 text-white font-bold py-3 rounded-xl hover:bg-slate-800 transition shadow-lg">Masuk Dashboard</button>
+                <input type="text" id="user" placeholder="ID Bisnis" class="w-full px-5 py-4 rounded-2xl border border-slate-200 outline-none focus:ring-4 focus:ring-emerald-500/10 transition-all">
+                <input type="password" id="pass" placeholder="Password Admin" class="w-full px-5 py-4 rounded-2xl border border-slate-200 outline-none focus:ring-4 focus:ring-emerald-500/10 transition-all">
+                <button onclick="prosesLogin()" id="btnLog" class="w-full bg-slate-900 text-white font-bold py-4 rounded-2xl hover:bg-slate-800 transition active:scale-95 shadow-xl">Masuk</button>
             </div>
         </div>
     </div>
 
-    <div id="dashSection" class="hidden animate-in fade-in duration-500">
-        <nav class="bg-white border-b p-4 sticky top-0 z-10 shadow-sm">
-            <div class="max-w-6xl mx-auto flex justify-between items-center">
-                <h1 id="txtNamaToko" class="font-bold text-xl text-emerald-600 italic">Dashboard</h1>
-                <button onclick="location.reload()" class="bg-rose-50 text-rose-600 px-4 py-2 rounded-lg text-xs font-bold hover:bg-rose-600 hover:text-white transition">KELUAR</button>
+    <div id="dashArea" class="hidden animate-in fade-in slide-in-from-bottom-5 duration-700">
+        <header class="p-6 border-b bg-white/50 sticky top-0 z-20 backdrop-blur-md">
+            <div class="max-w-7xl mx-auto flex justify-between items-center">
+                <div class="flex items-center gap-3">
+                    <span class="p-2 bg-emerald-500 text-white rounded-lg font-bold">SB</span>
+                    <h1 id="txtNamaToko" class="font-black text-xl italic tracking-tighter">--</h1>
+                </div>
+                <button onclick="logout()" class="px-4 py-2 bg-rose-50 text-rose-600 rounded-xl text-xs font-bold hover:bg-rose-600 hover:text-white transition-all">LOGOUT</button>
             </div>
-        </nav>
+        </header>
 
-        <main class="max-w-6xl mx-auto p-6">
-            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-                <table class="w-full text-left">
-                    <thead class="bg-slate-50 border-b text-slate-500 text-[10px] uppercase font-bold tracking-widest">
-                        <tr>
-                            <th class="p-4">Nama Pelanggan</th>
-                            <th class="p-4">WhatsApp</th>
-                            <th class="p-4">Tanggal & Jam</th>
-                            <th class="p-4 text-center">Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody id="isiTabel" class="divide-y divide-slate-100">
-                        </tbody>
-                </table>
-                <div id="emptyMsg" class="p-20 text-center text-slate-400 hidden">Belum ada pesanan masuk.</div>
+        <main class="max-w-7xl mx-auto p-6 md:p-10">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+                <div class="bg-white p-8 rounded-[2rem] border border-slate-100 shadow-sm">
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Total Pesanan</p>
+                    <h3 id="statTotal" class="text-4xl font-black mt-2">0</h3>
+                </div>
+                <div class="bg-emerald-500 p-8 rounded-[2rem] text-white shadow-lg shadow-emerald-200">
+                    <p class="text-[10px] font-bold opacity-80 uppercase tracking-widest">Hari Ini</p>
+                    <h3 id="statToday" class="text-4xl font-black mt-2">0</h3>
+                </div>
+                <div class="bg-white p-8 rounded-[2rem] border border-slate-100 shadow-sm">
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Status Server</p>
+                    <h3 class="text-xl font-black mt-2 text-emerald-500 flex items-center gap-2">
+                        <span class="w-3 h-3 bg-emerald-500 rounded-full animate-pulse"></span> AKTIF
+                    </h3>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-[2.5rem] border border-slate-100 shadow-sm overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left">
+                        <thead class="bg-slate-50 border-b">
+                            <tr class="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">
+                                <th class="p-6">Pelanggan</th>
+                                <th class="p-6">Kontak</th>
+                                <th class="p-6 text-center">Jadwal</th>
+                                <th class="p-6 text-right">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="isiTabel" class="divide-y divide-slate-50"></tbody>
+                    </table>
+                </div>
+                <div id="loader" class="p-20 text-center text-slate-400 italic">Memuat data...</div>
             </div>
         </main>
     </div>
@@ -52,60 +82,82 @@
         const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN0cnlsbGV1Ymt2dWlyc2tucWJrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE0ODM2OTksImV4cCI6MjA4NzA1OTY5OX0.sfnSvVgUoBRgwDyYY5VBAaHPHM_rPKBQ4a3w1ziKgUw";
         const sb = supabase.createClient(SB_URL, SB_KEY);
 
-        let bizId = "";
+        let activeBizId = localStorage.getItem('active_biz_id');
+
+        // AUTO LOGIN CHECK
+        window.onload = async () => {
+            if (activeBizId) {
+                const { data } = await sb.from('businesses').select('*').eq('id', activeBizId).single();
+                if(data) showDashboard(data);
+                else showLogin();
+            } else {
+                showLogin();
+            }
+        };
+
+        function showLogin() {
+            document.getElementById('loginArea').classList.remove('hidden');
+            document.getElementById('dashArea').classList.add('hidden');
+        }
+
+        function showDashboard(data) {
+            document.getElementById('loginArea').classList.add('hidden');
+            document.getElementById('dashArea').classList.remove('hidden');
+            document.getElementById('txtNamaToko').innerText = data.business_name;
+            ambilData();
+        }
 
         async function prosesLogin() {
             const u = document.getElementById('user').value.trim().toLowerCase();
             const p = document.getElementById('pass').value.trim();
-            const btn = document.getElementById('btnLog');
-
-            btn.innerText = "Memverifikasi...";
-            btn.disabled = true;
-
-            const { data, error } = await sb.from('businesses').select('*').eq('id', u).eq('admin_password', p).maybeSingle();
+            
+            const { data } = await sb.from('businesses').select('*').eq('id', u).eq('admin_password', p).maybeSingle();
 
             if (data) {
-                bizId = data.id;
-                document.getElementById('loginSection').classList.add('hidden');
-                document.getElementById('dashSection').classList.remove('hidden');
-                document.getElementById('txtNamaToko').innerText = data.business_name;
-                ambilData();
+                localStorage.setItem('active_biz_id', data.id);
+                activeBizId = data.id;
+                showDashboard(data);
             } else {
                 alert("ID atau Password salah!");
-                btn.innerText = "Masuk Dashboard";
-                btn.disabled = false;
             }
         }
 
         async function ambilData() {
-            const { data, error } = await sb.from('bookings').select('*').eq('business_id', bizId).order('created_at', { ascending: false });
+            const { data } = await sb.from('bookings').select('*').eq('business_id', activeBizId).order('created_at', { ascending: false });
             const tabel = document.getElementById('isiTabel');
-            const empty = document.getElementById('emptyMsg');
-
+            const loader = document.getElementById('loader');
+            
+            loader.classList.add('hidden');
             tabel.innerHTML = "";
-            if (data.length === 0) {
-                empty.classList.remove('hidden');
-            } else {
-                empty.classList.add('hidden');
-                data.forEach(b => {
-                    tabel.innerHTML += `
-                        <tr class="hover:bg-slate-50 transition">
-                            <td class="p-4 font-semibold text-slate-800">${b.client_name}</td>
-                            <td class="p-4 text-emerald-600 font-medium"><a href="https://wa.me/${b.client_wa}" target="_blank">${b.client_wa} ↗</a></td>
-                            <td class="p-4 text-sm">${b.booking_date} | <span class="font-bold">${b.booking_time}</span></td>
-                            <td class="p-4 text-center">
-                                <button onclick="hapus('${b.id}')" class="bg-slate-100 text-slate-600 px-3 py-1 rounded-md text-[10px] font-bold hover:bg-rose-500 hover:text-white transition">SELESAI</button>
-                            </td>
-                        </tr>
-                    `;
-                });
-            }
+            
+            // Statistik
+            const hariIni = new Date().toISOString().split('T')[0];
+            document.getElementById('statTotal').innerText = data.length;
+            document.getElementById('statToday').innerText = data.filter(b => b.booking_date === hariIni).length;
+
+            data.forEach(b => {
+                tabel.innerHTML += `
+                    <tr class="hover:bg-slate-50/50 transition-all">
+                        <td class="p-6 font-bold text-slate-800">${b.client_name}</td>
+                        <td class="p-6 font-medium text-emerald-600"><a href="https://wa.me/${b.client_wa}" target="_blank">${b.client_wa} ↗</a></td>
+                        <td class="p-6 text-center text-sm font-semibold">${b.booking_date} <br> <span class="text-slate-400 text-xs">${b.booking_time}</span></td>
+                        <td class="p-6 text-right">
+                            <button onclick="hapus('${b.id}')" class="bg-white border border-slate-200 text-slate-600 px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-rose-500 hover:text-white hover:border-rose-500 transition-all">Selesai</button>
+                        </td>
+                    </tr>
+                `;
+            });
         }
 
         async function hapus(id) {
-            if(!confirm("Tandai reservasi ini selesai?")) return;
+            if(!confirm("Hapus pesanan?")) return;
             await sb.from('bookings').delete().eq('id', id);
             ambilData();
+        }
+
+        function logout() {
+            localStorage.removeItem('active_biz_id');
+            location.reload();
         }
     </script>
 </body>
