@@ -28,27 +28,26 @@
                 <input type="password" id="pass" placeholder="Password" class="w-full bg-slate-900/50 p-4 rounded-2xl outline-none focus:ring-2 focus:ring-emerald-500 transition border border-white/5 text-white">
                 <button onclick="login()" id="btnLogin" class="w-full bg-emerald-500 text-slate-900 font-extrabold py-4 rounded-2xl hover:bg-emerald-400 transition shadow-lg shadow-emerald-500/20">MASUK</button>
             </div>
-            <p id="errorHint" class="text-rose-500 text-[10px] mt-4 text-center hidden font-bold uppercase"></p>
         </div>
     </div>
 
-    <div id="mainArea" class="hidden p-4 md:p-10 animate-in fade-in duration-500">
+    <div id="mainArea" class="hidden p-4 md:p-10">
         <div class="max-w-7xl mx-auto">
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4">
                 <div>
                     <h1 class="text-4xl font-extrabold tracking-tighter text-white italic">Finance <span class="text-emerald-400">Overview.</span></h1>
-                    <p class="text-slate-400 text-sm">Follow-up otomatis via Fonnte</p>
+                    <p class="text-slate-400 text-sm italic">Direct Fonnte Integration (No Pop-up)</p>
                 </div>
                 <button onclick="location.reload()" class="bg-slate-800 hover:bg-rose-500 text-white px-6 py-2 rounded-xl text-xs font-bold transition">LOGOUT</button>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                 <div class="glass-card p-8 rounded-[2rem] border-l-4 border-emerald-500">
-                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Total Income</p>
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Revenue</p>
                     <h3 id="revTotal" class="text-4xl font-extrabold mt-2 text-emerald-400 font-mono">Rp 0</h3>
                 </div>
                 <div class="glass-card p-8 rounded-[2rem] border-l-4 border-white">
-                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">License Active</p>
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Active Licenses</p>
                     <h3 id="activeCount" class="text-4xl font-extrabold mt-2 text-white font-mono">0</h3>
                 </div>
                 <div class="glass-card p-8 rounded-[2rem] border-l-4 border-amber-500">
@@ -59,15 +58,13 @@
 
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 <div class="lg:col-span-2 glass-card p-8 rounded-[2.5rem]">
-                    <h4 class="font-bold mb-6 text-slate-400 uppercase text-xs tracking-widest italic">Growth Stats</h4>
-                    <div class="h-[300px]">
-                        <canvas id="growthChart"></canvas>
-                    </div>
+                    <h4 class="font-bold mb-6 text-slate-400 uppercase text-xs tracking-widest italic">User Growth</h4>
+                    <div class="h-[300px]"><canvas id="growthChart"></canvas></div>
                 </div>
 
                 <div class="glass-card rounded-[2.5rem] overflow-hidden flex flex-col h-[500px]">
-                    <div class="p-6 border-b border-white/5 bg-white/5 font-black text-xs uppercase tracking-widest">
-                        Tenant List
+                    <div class="p-6 border-b border-white/5 bg-white/5 font-black text-xs uppercase tracking-widest italic">
+                        Action Required
                     </div>
                     <div id="listMitra" class="divide-y divide-white/5 overflow-y-auto flex-1"></div>
                 </div>
@@ -80,18 +77,18 @@
         const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN0cnlsbGV1Ymt2dWlyc2tucWJrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE0ODM2OTksImV4cCI6MjA4NzA1OTY5OX0.sfnSvVgUoBRgwDyYY5VBAaHPHM_rPKBQ4a3w1ziKgUw";
         const sb = supabase.createClient(SB_URL, SB_KEY);
         
-        // --- GANTI TOKEN INI JIKA MASIH GAGAL ---
+        // GANTI INI DENGAN TOKEN DARI TOMBOL HITAM 'TOKEN' DI SCREENSHOT ANDA
         const DEV_WA_TOKEN = "5dApyiRqU4nLdgaD1ncQ"; 
 
         async function login() {
             const u = document.getElementById('user').value.trim();
             const p = document.getElementById('pass').value.trim();
-            const { data, error } = await sb.from('super_admins').select('*').eq('username', u).eq('password', p).maybeSingle();
+            const { data } = await sb.from('super_admins').select('*').eq('username', u).eq('password', p).maybeSingle();
             if (data) {
                 document.getElementById('loginArea').classList.add('hidden');
                 document.getElementById('mainArea').classList.remove('hidden');
                 loadDashboardData();
-            } else { alert("Login Salah!"); }
+            } else { alert("Akses Ditolak!"); }
         }
 
         async function loadDashboardData() {
@@ -112,16 +109,16 @@
                     <div class="p-6 hover:bg-white/5 transition border-l-4 ${toko.is_active ? 'border-emerald-500' : 'border-amber-500'}">
                         <div class="flex justify-between items-start mb-2">
                             <div>
-                                <p class="font-bold text-white text-sm">${toko.business_name}</p>
-                                <p class="text-[10px] text-slate-500 font-mono italic">${toko.owner_wa}</p>
+                                <p class="font-bold text-white text-sm italic">${toko.business_name}</p>
+                                <p class="text-[10px] text-slate-500 font-mono tracking-tighter">${toko.owner_wa}</p>
                             </div>
                         </div>
                         <div class="grid grid-cols-2 gap-2 mt-4">
                             ${isPending ? `
-                                <button onclick="followUp('${toko.owner_wa}', '${toko.business_name}', this)" class="bg-amber-500 text-slate-900 py-2 rounded-xl text-[9px] font-bold uppercase hover:bg-amber-400 transition">Follow Up</button>
+                                <button onclick="followUp('${toko.owner_wa}', '${toko.business_name}', this)" class="bg-amber-500 text-slate-900 py-2 rounded-xl text-[9px] font-bold uppercase hover:bg-amber-400 transition">Kirim WA</button>
                                 <button onclick="toggleAktivasi('${toko.id}', true)" class="bg-emerald-500 text-slate-900 py-2 rounded-xl text-[9px] font-black uppercase hover:bg-emerald-400 transition">Approve</button>
                             ` : `
-                                <button onclick="toggleAktivasi('${toko.id}', false)" class="col-span-2 bg-slate-800 text-slate-400 py-2 rounded-xl text-[9px] font-bold uppercase border border-white/5">Non-aktifkan</button>
+                                <button onclick="toggleAktivasi('${toko.id}', false)" class="col-span-2 bg-slate-800 text-slate-400 py-2 rounded-xl text-[9px] font-bold uppercase border border-white/5">Deactivate</button>
                             `}
                         </div>
                     </div>
@@ -132,38 +129,43 @@
 
         async function followUp(wa, namaToko, btn) {
             const originalText = btn.innerText;
-            btn.innerText = "SND...";
+            btn.innerText = "WAIT...";
             btn.disabled = true;
 
-            // Bersihkan nomor WA
             let cleanWa = wa.toString().replace(/\D/g, ''); 
             if (cleanWa.startsWith('0')) cleanWa = '62' + cleanWa.slice(1);
 
             const pesan = `Halo kak! Kami dari SaaSBOOK Team. 👋\n\nKami melihat Anda telah mendaftarkan *${namaToko}* ke sistem kami. Saat ini status akun Anda masih Pending.\n\nJangan lewatkan kesempatan untuk mendigitalisasi reservasi Anda hanya dengan *Rp 500.000 / tahun*.\n\nApakah ada kendala dalam proses pembayaran? Kami siap membantu. 😊`;
             
-            // Gunakan FormData (lebih stabil untuk API Fonnte menghindari CORS)
-            const formData = new FormData();
-            formData.append('target', cleanWa);
-            formData.append('message', pesan);
+            // PENGIRIMAN MENGGUNAKAN URLSEARCHPARAMS (Sesuai dokumentasi Fonnte)
+            const data = new URLSearchParams();
+            data.append('target', cleanWa);
+            data.append('message', pesan);
+            data.append('delay', '2'); // Delay penting agar tidak dianggap spam oleh WA
 
             try {
+                // Fetch dengan mode 'no-cors' tidak disarankan karena kita butuh balasan JSON
+                // Gunakan pengiriman standar namun tangkap error dengan lebih baik
                 const response = await fetch('https://api.fonnte.com/send', {
                     method: 'POST',
-                    headers: { 'Authorization': DEV_WA_TOKEN },
-                    body: formData
+                    headers: { 
+                        'Authorization': DEV_WA_TOKEN
+                        // Jangan sertakan Content-Type jika menggunakan URLSearchParams, browser akan mengaturnya
+                    },
+                    body: data
                 });
                 
                 const result = await response.json();
-                console.log("Fonnte Log:", result);
 
                 if(result.status === true) {
-                    alert("✅ Pesan terkirim otomatis via Fonnte!");
+                    alert("✅ OTOMATIS: Pesan terkirim ke " + cleanWa);
                 } else {
-                    throw new Error(result.reason || "Server reject");
+                    console.warn("Fonnte reject:", result.reason);
+                    throw new Error(result.reason);
                 }
             } catch (err) {
-                console.error("Gagal Fonnte:", err);
-                alert("⚠️ API Fonnte Gagal/Limit. Mengalihkan ke WA Web...");
+                console.log("Fallback to WA Web because:", err.message);
+                // Jika error CORS atau API Limit, buka WA Web sebagai solusi terakhir
                 window.open(`https://api.whatsapp.com/send?phone=${cleanWa}&text=${encodeURIComponent(pesan)}`, '_blank');
             } finally {
                 btn.innerText = originalText;
@@ -172,9 +174,9 @@
         }
 
         async function toggleAktivasi(id, status) {
-            if(!confirm("Ubah status tenant?")) return;
-            await sb.from('businesses').update({ is_active: status }).eq('id', id);
-            loadDashboardData();
+            if(!confirm("Ubah status lisensi?")) return;
+            const { error } = await sb.from('businesses').update({ is_active: status }).eq('id', id);
+            if(!error) loadDashboardData();
         }
 
         function renderChart(data) {
