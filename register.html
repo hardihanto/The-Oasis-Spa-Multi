@@ -55,12 +55,13 @@
             btn.innerText = "Mendaftarkan...";
             btn.disabled = true;
 
-            const bizData = {
-                id: document.getElementById('bizId').value.trim().toLowerCase(),
-                business_name: document.getElementById('bizName').value.trim(),
-                admin_password: document.getElementById('adminPass').value.trim(),
-                wa_token: document.getElementById('waToken').value.trim()
-            };
+           // Ganti bagian bizData di register.html Anda dengan ini
+const bizData = {
+    id: String(document.getElementById('bizId').value).trim().toLowerCase(),
+    business_name: String(document.getElementById('bizName').value).trim(),
+    admin_password: String(document.getElementById('adminPass').value).trim(),
+    wa_token: String(document.getElementById('waToken').value).trim()
+};
 
             const { error } = await sb.from('businesses').insert([bizData]);
 
