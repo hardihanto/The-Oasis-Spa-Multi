@@ -55,55 +55,44 @@
     </div>
 
     <script>
-        const SUPABASE_URL = "https://oivvcaeqfyssnphvtojg.supabase.co";
-        const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9pdnZjYWVxZnlzc25waHZ0b2pnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE0NTk3NDAsImV4cCI6MjA4NzAzNTc0MH0.cG0WG5_TWu7ivdNVkz4BlGyugHwHIKRlQS50e9iXKwo";
-        const client = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+      // Pastikan tidak ada spasi di ujung URL atau KEY
+const SUPABASE_URL = "https://oivvcaeqfyssnphvtojg.supabase.co";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9pdnZjYWVxZnlzc25waHZ0b2pnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE0NTk3NDAsImV4cCI6MjA4NzAzNTc0MH0.cG0WG5_TWu7ivdNVkz4BlGyugHwHIKRlQS50e9iXKwo";
 
-        let currentBiz = null;
+// Inisialisasi client
+const client = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        // Cek Session saat halaman dibuka
-        window.onload = () => {
-            const saved = localStorage.getItem('oasis_session');
-            if (saved) {
-                showDashboard(JSON.parse(saved));
-            }
-        }
+async function handleLogin() {
+    const bizId = document.getElementById('loginBizId').value.trim().toLowerCase();
+    const pass = document.getElementById('loginPass').value.trim();
 
-     async function handleLogin() {
-    const bizIdInput = document.getElementById('loginBizId').value;
-    const passInput = document.getElementById('loginPass').value;
+    // LOG UNTUK DEBUG (Lihat di F12 Console)
+    console.log("Mencari ID:", bizId);
 
-    // Bersihkan spasi di awal/akhir
-    const bizId = bizIdInput.trim().toLowerCase();
-    const pass = passInput.trim();
-
-    console.log("Input User -> ID:", bizId, "| Pass:", pass);
-
+    // Gunakan query paling simpel
     const { data, error } = await client
         .from('businesses')
         .select('*')
-        .eq('id', bizId)
-        .maybeSingle();
+        .eq('id', bizId);
 
     if (error) {
-        alert("Error Database: " + error.message);
+        console.error("Error Detail:", error);
+        alert("Koneksi Error: " + error.message);
         return;
     }
 
-    if (!data) {
-        console.error("ID Bisnis tidak ditemukan di database!");
-        alert("Login Gagal: ID Bisnis '" + bizId + "' tidak terdaftar.");
-        return;
-    }
-
-    console.log("Data Database -> ID:", data.id, "| Pass:", data.admin_password);
-
-    if (data.admin_password === pass) {
-        localStorage.setItem('oasis_session', JSON.stringify(data));
-        showDashboard(data);
+    // Cek apakah data ditemukan dalam array
+    if (data && data.length > 0) {
+        const user = data[0];
+        if (user.admin_password === pass) {
+            console.log("Login Sukses!");
+            localStorage.setItem('oasis_session', JSON.stringify(user));
+            showDashboard(user);
+        } else {
+            alert("Password Salah!");
+        }
     } else {
-        console.error("Password salah! Database:", data.admin_password, "Input:", pass);
-        alert("Login Gagal! Password salah.");
+        alert("ID Bisnis '" + bizId + "' tidak ditemukan di database. Silakan cek Tabel Editor Supabase.");
     }
 }
         function showDashboard(bizData) {
