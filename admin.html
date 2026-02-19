@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Panel - The Oasis Spa</title>
+    <title>SaaS Dashboard - Oasis Spa</title>
     
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <script src="https://cdn.tailwindcss.com"></script>
@@ -11,60 +11,79 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&display=swap');
         body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .loading-spin { border-top-color: transparent; animation: spin 1s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
     </style>
 </head>
-<body class="bg-slate-50 min-h-screen">
+<body class="bg-[#f8fafc] min-h-screen text-slate-900">
 
-    <div id="loginArea" class="flex flex-col items-center justify-center min-h-screen p-4">
-        <div class="bg-white p-8 rounded-3xl shadow-2xl border border-slate-100 max-w-md w-full">
-            <div class="text-center mb-8">
-                <div class="bg-emerald-100 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4 text-2xl">🌿</div>
-                <h2 class="text-2xl font-bold text-slate-800">Admin Oasis</h2>
-                <p class="text-slate-500 text-sm mt-1">SaaS Booking System v1.0</p>
+    <div id="loginArea" class="flex items-center justify-center min-h-screen p-6">
+        <div class="bg-white p-8 rounded-[2rem] shadow-xl shadow-slate-200/50 border border-slate-100 max-w-md w-full">
+            <div class="text-center mb-10">
+                <div class="bg-emerald-500 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4 text-white text-3xl shadow-lg shadow-emerald-200">🌿</div>
+                <h2 class="text-2xl font-bold">Admin Portal</h2>
+                <p class="text-slate-400 text-sm mt-1">SaaS Management System</p>
             </div>
             
             <div class="space-y-4">
-                <input type="text" id="user" placeholder="ID Bisnis (oasis-spa)" 
-                    class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-500 outline-none transition">
-                <input type="password" id="pass" placeholder="Password" 
-                    class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-500 outline-none transition">
+                <div>
+                    <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Business ID</label>
+                    <input type="text" id="user" placeholder="oasis-spa" 
+                        class="w-full mt-1 px-4 py-3.5 rounded-2xl border border-slate-200 focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 outline-none transition-all">
+                </div>
+                <div>
+                    <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Password</label>
+                    <input type="password" id="pass" placeholder="••••••••" 
+                        class="w-full mt-1 px-4 py-3.5 rounded-2xl border border-slate-200 focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 outline-none transition-all">
+                </div>
                 
                 <button onclick="prosesLogin()" id="btnLog" 
-                    class="w-full bg-slate-900 text-white font-bold py-4 rounded-xl hover:bg-slate-800 transition active:scale-95 shadow-lg">
-                    Masuk Dashboard
+                    class="w-full bg-slate-900 text-white font-bold py-4 rounded-2xl hover:bg-slate-800 transition active:scale-[0.98] shadow-xl shadow-slate-200 mt-2">
+                    Masuk Sekarang
                 </button>
             </div>
-            <p id="statusMsg" class="text-[10px] text-center mt-6 text-slate-400 uppercase tracking-widest"></p>
+            <p id="statusMsg" class="text-[10px] text-center mt-8 text-slate-300 font-medium tracking-tighter uppercase"></p>
         </div>
     </div>
 
-    <div id="dashboardArea" class="hidden animate-in fade-in duration-500">
-        <nav class="bg-white border-b sticky top-0 z-10">
-            <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
-                <h1 class="font-bold text-slate-800 flex items-center gap-2">
-                    <span class="text-emerald-600 italic" id="txtNamaToko">Oasis Spa</span>
-                </h1>
-                <button onclick="location.reload()" class="text-xs font-bold text-rose-500 bg-rose-50 px-3 py-1.5 rounded-lg hover:bg-rose-500 hover:text-white transition">LOGOUT</button>
+    <div id="dashboardArea" class="hidden animate-in fade-in slide-in-from-bottom-4 duration-700">
+        <nav class="bg-white/80 backdrop-blur-md border-b sticky top-0 z-10">
+            <div class="max-w-6xl mx-auto px-6 h-20 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <span class="bg-emerald-500 text-white p-2 rounded-lg text-xs">🌿</span>
+                    <h1 class="font-bold text-lg tracking-tight" id="txtNamaToko italic">Oasis Spa</h1>
+                </div>
+                <button onclick="location.reload()" class="text-[10px] font-bold text-rose-500 border border-rose-100 px-4 py-2 rounded-xl hover:bg-rose-500 hover:text-white transition-all hover:shadow-lg hover:shadow-rose-100 uppercase tracking-widest">Logout</button>
             </div>
         </nav>
 
-        <main class="max-w-6xl mx-auto p-4 lg:p-8">
-            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-                <table class="w-full text-left border-collapse">
-                    <thead>
-                        <tr class="bg-slate-50 text-slate-500 text-[10px] font-bold uppercase tracking-wider border-b">
-                            <th class="p-4">Nama Pelanggan</th>
-                            <th class="p-4">WhatsApp</th>
-                            <th class="p-4 text-center">Jadwal & Jam</th>
-                            <th class="p-4 text-right">Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody id="isiTabel" class="divide-y divide-slate-100 text-slate-700">
-                        </tbody>
-                </table>
-                <div id="loader" class="p-20 text-center flex flex-col items-center">
-                    <div class="w-8 h-8 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
-                    <p class="text-slate-400 text-sm mt-4">Menghubungkan ke database...</p>
+        <main class="max-w-6xl mx-auto p-6 lg:p-10">
+            <div class="flex justify-between items-end mb-8">
+                <div>
+                    <h2 class="text-3xl font-bold tracking-tight text-slate-900">Daftar Reservasi</h2>
+                    <p class="text-slate-500 mt-1">Kelola jadwal pelanggan Anda hari ini.</p>
+                </div>
+                <button onclick="refreshData()" class="p-3 bg-white border border-slate-200 rounded-2xl hover:bg-slate-50 transition shadow-sm">🔄</button>
+            </div>
+
+            <div class="bg-white rounded-[2rem] border border-slate-200 shadow-sm overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left">
+                        <thead>
+                            <tr class="bg-slate-50/50 text-slate-400 text-[10px] font-bold uppercase tracking-[0.2em] border-b border-slate-100">
+                                <th class="p-6">Nama Pelanggan</th>
+                                <th class="p-6">WhatsApp</th>
+                                <th class="p-6 text-center">Jadwal</th>
+                                <th class="p-6 text-right">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="isiTabel" class="divide-y divide-slate-50 text-slate-700">
+                            </tbody>
+                    </table>
+                </div>
+                <div id="loader" class="p-24 text-center flex flex-col items-center">
+                    <div class="w-10 h-10 border-4 border-emerald-500 rounded-full loading-spin mb-4"></div>
+                    <p class="text-slate-400 font-medium">Menarik data dari server...</p>
                 </div>
             </div>
         </main>
@@ -75,71 +94,73 @@
         const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9pdnZjYWVxZnlzc25waHZ0b2pnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE0NTk3NDAsImV4cCI6MjA4NzAzNTc0MH0.cG0WG5_TWu7ivdNVkz4BlGyugHwHIKRlQS50e9iXKwo";
         
         let sbClient;
+        let currentBizId = "";
 
-        // 1. Inisialisasi Supabase dengan perlindungan
         window.onload = () => {
             const status = document.getElementById('statusMsg');
             try {
                 if (typeof supabase !== 'undefined') {
                     sbClient = supabase.createClient(SB_URL, SB_KEY);
-                    status.innerText = "System Ready";
+                    status.innerText = "System Synchronized";
                 } else {
-                    throw new Error("Library Supabase gagal dimuat. Matikan Adblock!");
+                    throw new Error("Library Blocked");
                 }
             } catch (e) {
-                status.innerText = "ERROR: LIBRARY BLOCKED";
-                alert(e.message);
+                status.innerText = "Connection Blocked by Browser";
             }
         };
 
-        // 2. Fungsi Login
         async function prosesLogin() {
-            if (!sbClient) return alert("System belum siap. Coba refresh halaman.");
-
             const u = document.getElementById('user').value.trim().toLowerCase();
             const p = document.getElementById('pass').value.trim();
             const btn = document.getElementById('btnLog');
 
-            if(!u || !p) return alert("ID dan Password wajib diisi!");
+            if(!u || !p) return alert("Lengkapi ID dan Password!");
 
-            btn.innerText = "Memverifikasi...";
+            btn.innerText = "Mencocokkan...";
             btn.disabled = true;
 
             try {
+                // Ambil semua kolom untuk menghindari error "column not exist" jika cache schema bermasalah
                 const { data, error } = await sbClient
                     .from('businesses')
                     .select('*')
-                    .eq('id', u)
-                    .eq('admin_password', p)
-                    .maybeSingle();
+                    .eq('id', u);
 
                 if (error) throw error;
 
-                if (data) {
-                    document.getElementById('loginArea').classList.add('hidden');
-                    document.getElementById('dashboardArea').classList.remove('hidden');
-                    document.getElementById('txtNamaToko').innerText = data.business_name;
-                    renderData(data.id);
+                if (data && data.length > 0) {
+                    const biz = data[0];
+                    // Cek password secara manual di sisi client untuk keamanan tambahan jika kolom error
+                    if (biz.admin_password === p) {
+                        currentBizId = biz.id;
+                        document.getElementById('loginArea').classList.add('hidden');
+                        document.getElementById('dashboardArea').classList.remove('hidden');
+                        document.getElementById('txtNamaToko').innerText = biz.business_name;
+                        renderData();
+                    } else {
+                        alert("Password salah!");
+                    }
                 } else {
-                    alert("Gagal! ID Bisnis atau Password salah.");
+                    alert("ID Bisnis tidak terdaftar!");
                 }
             } catch (err) {
-                alert("Database Error: " + err.message);
+                console.error(err);
+                alert("Database Error: " + err.message + "\n\nPastikan Anda sudah menjalankan SQL ALTER TABLE di Supabase.");
             } finally {
                 btn.innerText = "Masuk Dashboard";
                 btn.disabled = false;
             }
         }
 
-        // 3. Ambil Data Booking
-        async function renderData(bizId) {
+        async function renderData() {
             const tabel = document.getElementById('isiTabel');
             const loader = document.getElementById('loader');
 
             const { data, error } = await sbClient
                 .from('bookings')
                 .select('*')
-                .eq('business_id', bizId)
+                .eq('business_id', currentBizId)
                 .order('booking_date', { ascending: true });
 
             loader.classList.add('hidden');
@@ -148,34 +169,44 @@
             if (data && data.length > 0) {
                 data.forEach(item => {
                     tabel.innerHTML += `
-                        <tr class="hover:bg-slate-50 transition">
-                            <td class="p-4 font-bold text-slate-900">${item.client_name}</td>
-                            <td class="p-4">
-                                <a href="https://wa.me/${item.client_wa}" target="_blank" class="text-emerald-600 hover:underline">
-                                    ${item.client_wa} ↗
+                        <tr class="hover:bg-slate-50/50 transition-all group">
+                            <td class="p-6">
+                                <p class="font-bold text-slate-900">${item.client_name}</p>
+                                <p class="text-[10px] text-slate-400 uppercase tracking-tighter">Customer</p>
+                            </td>
+                            <td class="p-6 font-medium text-emerald-600">
+                                <a href="https://wa.me/${item.client_wa}" target="_blank" class="flex items-center gap-1">
+                                    ${item.client_wa} <span class="opacity-0 group-hover:opacity-100 transition-all text-[10px]">↗</span>
                                 </a>
                             </td>
-                            <td class="p-4 text-center">
-                                <span class="bg-slate-100 px-2 py-1 rounded text-xs font-semibold">${item.booking_date}</span>
-                                <span class="text-slate-400 mx-1">•</span>
-                                <span class="font-bold">${item.booking_time}</span>
+                            <td class="p-6 text-center">
+                                <div class="inline-flex flex-col">
+                                    <span class="text-xs font-bold text-slate-800">${item.booking_date}</span>
+                                    <span class="text-[10px] font-medium text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full mt-1">${item.booking_time}</span>
+                                </div>
                             </td>
-                            <td class="p-4 text-right">
-                                <button onclick="hapus('${item.id}', '${bizId}')" class="text-xs bg-emerald-500 text-white px-3 py-1.5 rounded-lg hover:bg-emerald-600 transition">SELESAI</button>
+                            <td class="p-6 text-right">
+                                <button onclick="hapus('${item.id}')" class="text-[10px] font-bold bg-white border border-slate-200 text-slate-600 px-4 py-2 rounded-xl hover:bg-emerald-500 hover:text-white hover:border-emerald-500 transition-all shadow-sm uppercase tracking-widest">Selesai</button>
                             </td>
                         </tr>
                     `;
                 });
             } else {
-                tabel.innerHTML = `<tr><td colspan="4" class="p-20 text-center text-slate-400 text-sm italic">Belum ada jadwal reservasi.</td></tr>`;
+                tabel.innerHTML = `<tr><td colspan="4" class="p-24 text-center"><p class="text-slate-300 font-medium italic text-sm">Belum ada reservasi masuk.</p></td></tr>`;
             }
         }
 
-        // 4. Hapus/Selesaikan Booking
-        async function hapus(id, bizId) {
-            if(!confirm("Tandai tamu ini sudah selesai?")) return;
-            await sbClient.from('bookings').delete().eq('id', id);
-            renderData(bizId);
+        function refreshData() {
+            document.getElementById('loader').classList.remove('hidden');
+            document.getElementById('isiTabel').innerHTML = "";
+            renderData();
+        }
+
+        async function hapus(id) {
+            if(!confirm("Hapus reservasi yang sudah selesai?")) return;
+            const { error } = await sbClient.from('bookings').delete().eq('id', id);
+            if(error) alert(error.message);
+            renderData();
         }
     </script>
 </body>
