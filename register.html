@@ -3,61 +3,88 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registrasi Mitra - SaaSBOOK</title>
+    <title>Merchant Registration | SaaSBOOK</title>
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap');
-        body { font-family: 'Plus Jakarta Sans', sans-serif; }
-        .input-box { @apply w-full bg-slate-900 border border-white/10 p-4 rounded-2xl outline-none focus:ring-2 focus:ring-emerald-500 text-white transition; }
-        .label-text { @apply text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1 mb-2 block; }
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #020617; }
+        .glass { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.05); }
+        .input-group input { 
+            @apply w-full bg-slate-900/50 border border-slate-700/50 p-4 pl-12 rounded-2xl outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 transition-all text-white placeholder:text-slate-600;
+        }
+        .input-group label { @apply text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-2 block ml-1; }
+        .input-group i { @apply absolute left-4 top-[46px] text-slate-500; }
     </style>
 </head>
-<body class="bg-[#0f172a] text-slate-200 min-h-screen flex items-center justify-center p-6">
+<body class="flex items-center justify-center min-h-screen p-4 overflow-x-hidden">
 
-    <div class="bg-slate-800/50 backdrop-blur-xl p-8 md:p-12 rounded-[3rem] shadow-2xl w-full max-w-xl border border-white/5">
+    <div class="absolute top-0 left-0 w-full h-full overflow-hidden -z-10">
+        <div class="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-emerald-500/10 rounded-full blur-[120px]"></div>
+        <div class="absolute bottom-[-10%] right-[-10%] w-[30%] h-[30%] bg-blue-600/10 rounded-full blur-[120px]"></div>
+    </div>
+
+    <div class="glass p-8 md:p-12 rounded-[2.5rem] w-full max-w-2xl shadow-2xl relative">
         <div class="text-center mb-10">
-            <h2 class="text-3xl font-extrabold text-white italic">Join <span class="text-emerald-400">SaaSBOOK.</span></h2>
-            <p class="text-slate-400 text-sm mt-2">Lengkapi data bisnis Anda untuk aktivasi lisensi</p>
-        </div>
-        
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div class="md:col-span-2">
-                <label class="label-text">Nama Bisnis / Toko</label>
-                <input type="text" id="bizName" placeholder="Contoh: Barbershop Modern" class="input-box">
+            <div class="inline-block p-4 bg-emerald-500/10 rounded-3xl mb-4">
+                <i class="fa-solid fa-rocket text-3xl text-emerald-400"></i>
             </div>
-
-            <div>
-                <label class="label-text">Nomor WhatsApp</label>
-                <input type="number" id="bizWA" placeholder="0812..." class="input-box">
-            </div>
-
-            <div>
-                <label class="label-text">Sub-Domain / URL ID</label>
-                <input type="text" id="bizSlug" placeholder="contoh-toko" class="input-box">
-            </div>
-
-            <div class="md:col-span-1">
-                <label class="label-text">Username Admin</label>
-                <input type="text" id="bizUser" placeholder="admin123" class="input-box">
-            </div>
-
-            <div class="md:col-span-1">
-                <label class="label-text">Password Admin</label>
-                <input type="password" id="bizPass" placeholder="******" class="input-box">
-            </div>
+            <h1 class="text-3xl font-extrabold text-white tracking-tight">Mulai Bisnis <span class="text-emerald-400">Digital.</span></h1>
+            <p class="text-slate-400 mt-2 text-sm">Lengkapi detail untuk membuat dashboard SaaSBOOK Anda</p>
         </div>
 
-        <div class="mt-10">
-            <button onclick="register()" id="btnReg" class="w-full bg-emerald-500 text-slate-900 font-black py-5 rounded-[2rem] hover:bg-emerald-400 transition-all transform hover:scale-[1.02] active:scale-95 shadow-xl shadow-emerald-500/20 uppercase tracking-tighter">
-                Daftar & Request Aktivasi
-            </button>
-            <p class="text-center text-[10px] text-slate-500 mt-4 italic">Dengan mendaftar, Anda menyetujui biaya lisensi Rp 500.000/tahun</p>
-        </div>
+        <form id="regForm" onsubmit="return false;" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            
+            <div class="input-group md:col-span-2 relative">
+                <label>Nama Bisnis / Brand</label>
+                <i class="fa-solid fa-store"></i>
+                <input type="text" id="bizName" placeholder="Contoh: Assyifa Beauty Spa" required>
+            </div>
+
+            <div class="input-group relative">
+                <label>WhatsApp Aktif</label>
+                <i class="fa-brands fa-whatsapp text-lg"></i>
+                <input type="number" id="bizWA" placeholder="08123456789" required>
+            </div>
+
+            <div class="input-group relative">
+                <label>Sub-domain (URL)</label>
+                <i class="fa-solid fa-globe text-sm"></i>
+                <input type="text" id="bizSlug" placeholder="assyifa-spa" required>
+            </div>
+
+            <div class="md:col-span-2 flex items-center gap-4 my-2">
+                <div class="h-[1px] bg-slate-800 flex-1"></div>
+                <span class="text-[10px] text-slate-600 font-bold uppercase tracking-[0.2em]">Akses Akun Admin</span>
+                <div class="h-[1px] bg-slate-800 flex-1"></div>
+            </div>
+
+            <div class="input-group relative">
+                <label>Username</label>
+                <i class="fa-solid fa-user"></i>
+                <input type="text" id="bizUser" placeholder="admin_assyifa" required>
+            </div>
+
+            <div class="input-group relative">
+                <label>Password</label>
+                <i class="fa-solid fa-lock"></i>
+                <input type="password" id="bizPass" placeholder="••••••••" required>
+            </div>
+
+            <div class="md:col-span-2 mt-4">
+                <button onclick="register()" id="btnReg" class="group w-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold py-5 rounded-2xl transition-all shadow-lg shadow-emerald-500/20 flex items-center justify-center gap-2">
+                    <span>DAFTAR & AKTIVASI SEKARANG</span>
+                    <i class="fa-solid fa-arrow-right transition-transform group-hover:translate-x-1"></i>
+                </button>
+                <p class="text-[10px] text-slate-500 text-center mt-6">
+                    <i class="fa-solid fa-shield-halved mr-1"></i> Data Anda aman dan terenkripsi secara otomatis.
+                </p>
+            </div>
+        </form>
     </div>
 
     <script>
-        // CONFIG SUPABASE
         const SB_URL = "https://strylleubkvuirsknqbk.supabase.co";
         const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN0cnlsbGV1Ymt2dWlyc2tucWJrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE0ODM2OTksImV4cCI6MjA4NzA1OTY5OX0.sfnSvVgUoBRgwDyYY5VBAaHPHM_rPKBQ4a3w1ziKgUw";
         const sb = supabase.createClient(SB_URL, SB_KEY);
@@ -70,34 +97,30 @@
             const bizPass = document.getElementById('bizPass').value;
             const btn = document.getElementById('btnReg');
 
-            // Validasi Sederhana
             if(!bizName || !bizWA || !bizSlug || !bizUser || !bizPass) {
-                return alert("⚠️ Maaf, semua kolom wajib diisi!");
+                return alert("Mohon lengkapi semua data pendaftaran.");
             }
 
-            btn.innerText = "SEDANG MENYIMPAN...";
+            btn.innerHTML = '<i class="fa-solid fa-circle-notch animate-spin"></i> MEMPROSES DATA...';
             btn.disabled = true;
 
-            // Memasukkan data sesuai kolom di database Anda
-            const { data, error } = await sb.from('businesses').insert([
+            const { error } = await sb.from('businesses').insert([
                 { 
                     business_name: bizName, 
                     owner_wa: bizWA, 
-                    slug: bizSlug.toLowerCase().replace(/\s+/g, '-'), // Memastikan URL ramah sistem
+                    slug: bizSlug.toLowerCase().trim().replace(/\s+/g, '-'), 
                     admin_username: bizUser,
                     admin_password: bizPass,
-                    is_active: false // Menunggu Approval Super Admin
+                    is_active: false 
                 }
             ]);
 
             if(!error) {
-                alert("✅ PENDAFTARAN BERHASIL!\n\nData Anda sudah masuk. Admin akan menghubungi Anda via WhatsApp ("+bizWA+") untuk proses aktivasi pembayaran.");
-                // Redirect ke wa admin otomatis setelah daftar (Opsional)
+                alert("Pendaftaran Berhasil! Akun Anda sedang diverifikasi.");
                 window.location.reload();
             } else {
-                console.error(error);
-                alert("❌ Gagal Simpan: " + error.message);
-                btn.innerText = "DAFTAR SEKARANG";
+                alert("Gagal menyimpan data: " + error.message);
+                btn.innerHTML = '<span>DAFTAR & AKTIVASI SEKARANG</span> <i class="fa-solid fa-arrow-right"></i>';
                 btn.disabled = false;
             }
         }
