@@ -24,7 +24,7 @@
                 <h1 class="text-2xl font-extrabold text-emerald-400 mt-2">Owner Panel</h1>
             </div>
             <div class="space-y-4">
-                <input type="text" id="user" placeholder="Username (dev_admin)" class="w-full bg-slate-900/50 p-4 rounded-2xl outline-none focus:ring-2 focus:ring-emerald-500 transition border border-white/5 text-white">
+                <input type="text" id="user" placeholder="Username" class="w-full bg-slate-900/50 p-4 rounded-2xl outline-none focus:ring-2 focus:ring-emerald-500 transition border border-white/5 text-white">
                 <input type="password" id="pass" placeholder="Password" class="w-full bg-slate-900/50 p-4 rounded-2xl outline-none focus:ring-2 focus:ring-emerald-500 transition border border-white/5 text-white">
                 <button onclick="login()" id="btnLogin" class="w-full bg-emerald-500 text-slate-900 font-extrabold py-4 rounded-2xl hover:bg-emerald-400 transition shadow-lg shadow-emerald-500/20">MASUK</button>
             </div>
@@ -37,37 +37,37 @@
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4">
                 <div>
                     <h1 class="text-4xl font-extrabold tracking-tighter text-white italic">Finance <span class="text-emerald-400">Overview.</span></h1>
-                    <p class="text-slate-400 text-sm italic font-medium">Monitoring revenue & tenant approval</p>
+                    <p class="text-slate-400 text-sm">Follow-up otomatis via Fonnte</p>
                 </div>
                 <button onclick="location.reload()" class="bg-slate-800 hover:bg-rose-500 text-white px-6 py-2 rounded-xl text-xs font-bold transition">LOGOUT</button>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                <div class="glass-card p-8 rounded-[2rem] relative overflow-hidden border-l-4 border-emerald-500">
-                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Total Penghasilan (Lunas)</p>
+                <div class="glass-card p-8 rounded-[2rem] border-l-4 border-emerald-500">
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Total Income</p>
                     <h3 id="revTotal" class="text-4xl font-extrabold mt-2 text-emerald-400 font-mono">Rp 0</h3>
                 </div>
                 <div class="glass-card p-8 rounded-[2rem] border-l-4 border-white">
-                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Lisensi Terjual</p>
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">License Active</p>
                     <h3 id="activeCount" class="text-4xl font-extrabold mt-2 text-white font-mono">0</h3>
                 </div>
                 <div class="glass-card p-8 rounded-[2rem] border-l-4 border-amber-500">
-                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Menunggu Bayar</p>
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Pending Payment</p>
                     <h3 id="pendingCount" class="text-4xl font-extrabold mt-2 text-amber-500 font-mono">0</h3>
                 </div>
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 <div class="lg:col-span-2 glass-card p-8 rounded-[2.5rem]">
-                    <h4 class="font-bold mb-6 text-slate-400 uppercase text-xs tracking-widest italic">Pertumbuhan Mitra</h4>
+                    <h4 class="font-bold mb-6 text-slate-400 uppercase text-xs tracking-widest italic">Growth Stats</h4>
                     <div class="h-[300px]">
                         <canvas id="growthChart"></canvas>
                     </div>
                 </div>
 
-                <div class="glass-card rounded-[2.5rem] overflow-hidden flex flex-col h-[450px]">
+                <div class="glass-card rounded-[2.5rem] overflow-hidden flex flex-col h-[500px]">
                     <div class="p-6 border-b border-white/5 bg-white/5 font-black text-xs uppercase tracking-widest">
-                        Tenant Management
+                        Tenant List
                     </div>
                     <div id="listMitra" class="divide-y divide-white/5 overflow-y-auto flex-1"></div>
                 </div>
@@ -79,46 +79,23 @@
         const SB_URL = "https://strylleubkvuirsknqbk.supabase.co";
         const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN0cnlsbGV1Ymt2dWlyc2tucWJrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE0ODM2OTksImV4cCI6MjA4NzA1OTY5OX0.sfnSvVgUoBRgwDyYY5VBAaHPHM_rPKBQ4a3w1ziKgUw";
         const sb = supabase.createClient(SB_URL, SB_KEY);
-        const DEV_WA_TOKEN = "5dApyiRqU4nLdgaD1ncQ";
+        
+        // --- GANTI TOKEN INI JIKA MASIH GAGAL ---
+        const DEV_WA_TOKEN = "5dApyiRqU4nLdgaD1ncQ"; 
 
         async function login() {
-            const userInp = document.getElementById('user').value.trim();
-            const passInp = document.getElementById('pass').value.trim();
-            const errHint = document.getElementById('errorHint');
-            const btn = document.getElementById('btnLogin');
-
-            btn.innerText = "Checking...";
-            errHint.classList.add('hidden');
-
-            try {
-                const { data, error } = await sb.from('super_admins')
-                    .select('*')
-                    .eq('username', userInp)
-                    .eq('password', passInp)
-                    .maybeSingle();
-
-                if (error) throw error;
-
-                if (data) {
-                    document.getElementById('loginArea').classList.add('hidden');
-                    document.getElementById('mainArea').classList.remove('hidden');
-                    loadDashboardData();
-                } else {
-                    errHint.innerText = "Username atau Password Salah!";
-                    errHint.classList.remove('hidden');
-                    btn.innerText = "MASUK";
-                }
-            } catch (e) {
-                console.error("Login Error:", e.message);
-                errHint.innerText = "Sistem Error: " + e.message;
-                errHint.classList.remove('hidden');
-                btn.innerText = "MASUK";
-            }
+            const u = document.getElementById('user').value.trim();
+            const p = document.getElementById('pass').value.trim();
+            const { data, error } = await sb.from('super_admins').select('*').eq('username', u).eq('password', p).maybeSingle();
+            if (data) {
+                document.getElementById('loginArea').classList.add('hidden');
+                document.getElementById('mainArea').classList.remove('hidden');
+                loadDashboardData();
+            } else { alert("Login Salah!"); }
         }
 
         async function loadDashboardData() {
             const { data: businesses } = await sb.from('businesses').select('*').order('created_at', { ascending: false });
-            
             const active = businesses.filter(b => b.is_active);
             const pending = businesses.filter(b => !b.is_active);
 
@@ -136,18 +113,15 @@
                         <div class="flex justify-between items-start mb-2">
                             <div>
                                 <p class="font-bold text-white text-sm">${toko.business_name}</p>
-                                <p class="text-[10px] text-slate-500 font-mono italic">ID: ${toko.id}</p>
+                                <p class="text-[10px] text-slate-500 font-mono italic">${toko.owner_wa}</p>
                             </div>
-                            <span class="text-[9px] font-black uppercase ${toko.is_active ? 'text-emerald-500' : 'text-amber-500'}">
-                                ${toko.is_active ? 'Active' : 'Pending'}
-                            </span>
                         </div>
                         <div class="grid grid-cols-2 gap-2 mt-4">
                             ${isPending ? `
-                                <button onclick="followUp('${toko.owner_wa}', '${toko.business_name}')" class="bg-amber-500/10 text-amber-500 border border-amber-500/20 py-2 rounded-xl text-[9px] font-bold uppercase hover:bg-amber-500 hover:text-white transition">Follow Up</button>
+                                <button onclick="followUp('${toko.owner_wa}', '${toko.business_name}', this)" class="bg-amber-500 text-slate-900 py-2 rounded-xl text-[9px] font-bold uppercase hover:bg-amber-400 transition">Follow Up</button>
                                 <button onclick="toggleAktivasi('${toko.id}', true)" class="bg-emerald-500 text-slate-900 py-2 rounded-xl text-[9px] font-black uppercase hover:bg-emerald-400 transition">Approve</button>
                             ` : `
-                                <button onclick="toggleAktivasi('${toko.id}', false)" class="col-span-2 bg-slate-800 text-rose-500 py-2 rounded-xl text-[9px] font-bold uppercase hover:bg-rose-600 hover:text-white transition border border-rose-500/20">Deactivate</button>
+                                <button onclick="toggleAktivasi('${toko.id}', false)" class="col-span-2 bg-slate-800 text-slate-400 py-2 rounded-xl text-[9px] font-bold uppercase border border-white/5">Non-aktifkan</button>
                             `}
                         </div>
                     </div>
@@ -156,61 +130,65 @@
             renderChart(businesses);
         }
 
-        async function followUp(wa, namaToko) {
+        async function followUp(wa, namaToko, btn) {
+            const originalText = btn.innerText;
+            btn.innerText = "SND...";
+            btn.disabled = true;
+
+            // Bersihkan nomor WA
             let cleanWa = wa.toString().replace(/\D/g, ''); 
             if (cleanWa.startsWith('0')) cleanWa = '62' + cleanWa.slice(1);
-            if (cleanWa.startsWith('8')) cleanWa = '62' + cleanWa;
 
             const pesan = `Halo kak! Kami dari SaaSBOOK Team. 👋\n\nKami melihat Anda telah mendaftarkan *${namaToko}* ke sistem kami. Saat ini status akun Anda masih Pending.\n\nJangan lewatkan kesempatan untuk mendigitalisasi reservasi Anda hanya dengan *Rp 500.000 / tahun*.\n\nApakah ada kendala dalam proses pembayaran? Kami siap membantu. 😊`;
             
+            // Gunakan FormData (lebih stabil untuk API Fonnte menghindari CORS)
+            const formData = new FormData();
+            formData.append('target', cleanWa);
+            formData.append('message', pesan);
+
             try {
-                const res = await fetch('https://api.fonnte.com/send', {
+                const response = await fetch('https://api.fonnte.com/send', {
                     method: 'POST',
                     headers: { 'Authorization': DEV_WA_TOKEN },
-                    body: new URLSearchParams({ 'target': cleanWa, 'message': pesan })
+                    body: formData
                 });
-                const result = await res.json();
-                if(result.status) alert("✅ Terkirim ke " + cleanWa);
-                else throw new Error(result.reason);
+                
+                const result = await response.json();
+                console.log("Fonnte Log:", result);
+
+                if(result.status === true) {
+                    alert("✅ Pesan terkirim otomatis via Fonnte!");
+                } else {
+                    throw new Error(result.reason || "Server reject");
+                }
             } catch (err) {
-                window.open(`https://wa.me/${cleanWa}?text=${encodeURIComponent(pesan)}`, '_blank');
+                console.error("Gagal Fonnte:", err);
+                alert("⚠️ API Fonnte Gagal/Limit. Mengalihkan ke WA Web...");
+                window.open(`https://api.whatsapp.com/send?phone=${cleanWa}&text=${encodeURIComponent(pesan)}`, '_blank');
+            } finally {
+                btn.innerText = originalText;
+                btn.disabled = false;
             }
         }
 
         async function toggleAktivasi(id, status) {
-            if(!confirm("Ubah status lisensi?")) return;
-            const { error } = await sb.from('businesses').update({ is_active: status }).eq('id', id);
-            if(!error) loadDashboardData();
+            if(!confirm("Ubah status tenant?")) return;
+            await sb.from('businesses').update({ is_active: status }).eq('id', id);
+            loadDashboardData();
         }
 
         function renderChart(data) {
             const ctx = document.getElementById('growthChart').getContext('2d');
             const monthlyCounts = new Array(12).fill(0);
             data.forEach(item => monthlyCounts[new Date(item.created_at).getMonth()]++);
-
             if (window.myChart) window.myChart.destroy();
             window.myChart = new Chart(ctx, {
                 type: 'line',
                 data: {
                     labels: ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agt", "Sep", "Okt", "Nov", "Des"],
-                    datasets: [{
-                        data: monthlyCounts,
-                        borderColor: '#10b981',
-                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
-                        fill: true,
-                        tension: 0.4,
-                        borderWidth: 3
-                    }]
+                    datasets: [{ data: monthlyCounts, borderColor: '#10b981', backgroundColor: 'rgba(16, 185, 129, 0.1)', fill: true, tension: 0.4 }]
                 },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: {
-                        y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' } },
-                        x: { grid: { display: false } }
-                    }
-                }
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
             });
         }
     </script>
