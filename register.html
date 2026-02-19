@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daftar Mitra - SaaS Booking</title>
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-50 flex items-center justify-center min-h-screen p-4">
+
+    <div class="bg-white p-8 rounded-3xl shadow-xl max-w-md w-full border border-slate-100">
+        <div class="text-center mb-8">
+            <h1 class="text-3xl font-extrabold text-slate-800">Daftarkan Bisnis</h1>
+            <p class="text-slate-500 mt-2">Mulai kelola reservasi Anda secara digital</p>
+        </div>
+
+        <form id="regForm" class="space-y-4">
+            <div>
+                <label class="block text-sm font-bold text-slate-700 mb-1">ID Bisnis (Tanpa Spasi)</label>
+                <input type="text" id="bizId" placeholder="contoh: mawar-salon" required
+                    class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 outline-none transition">
+            </div>
+            <div>
+                <label class="block text-sm font-bold text-slate-700 mb-1">Nama Bisnis</label>
+                <input type="text" id="bizName" placeholder="Mawar Salon & Spa" required
+                    class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 outline-none transition">
+            </div>
+            <div>
+                <label class="block text-sm font-bold text-slate-700 mb-1">Password Admin</label>
+                <input type="password" id="adminPass" placeholder="••••••••" required
+                    class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 outline-none transition">
+            </div>
+            <div>
+                <label class="block text-sm font-bold text-slate-700 mb-1">Token Fonnte (Opsional)</label>
+                <input type="text" id="waToken" placeholder="Token WhatsApp"
+                    class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 outline-none transition">
+            </div>
+
+            <button type="submit" id="btnSubmit"
+                class="w-full bg-blue-600 text-white font-bold py-4 rounded-xl hover:bg-blue-700 transition shadow-lg shadow-blue-200 active:scale-95">
+                Aktifkan Dashboard Saya
+            </button>
+        </form>
+    </div>
+
+    <script>
+        const SB_URL = "https://oivvcaeqfyssnphvtojg.supabase.co";
+        const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9pdnZjYWVxZnlzc25waHZ0b2pnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE0NTk3NDAsImV4cCI6MjA4NzAzNTc0MH0.cG0WG5_TWu7ivdNVkz4BlGyugHwHIKRlQS50e9iXKwo";
+        const sb = supabase.createClient(SB_URL, SB_KEY);
+
+        document.getElementById('regForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('btnSubmit');
+            btn.innerText = "Mendaftarkan...";
+            btn.disabled = true;
+
+            const bizData = {
+                id: document.getElementById('bizId').value.trim().toLowerCase(),
+                business_name: document.getElementById('bizName').value.trim(),
+                admin_password: document.getElementById('adminPass').value.trim(),
+                wa_token: document.getElementById('waToken').value.trim()
+            };
+
+            const { error } = await sb.from('businesses').insert([bizData]);
+
+            if (error) {
+                alert("Gagal: " + error.message);
+                btn.innerText = "Aktifkan Dashboard Saya";
+                btn.disabled = false;
+            } else {
+                alert("Berhasil Terdaftar! Anda sekarang bisa login.");
+                window.location.href = "admin.html"; // Arahkan ke dashboard
+            }
+        });
+    </script>
+</body>
+</html>
