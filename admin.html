@@ -3,142 +3,94 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard - SaaS</title>
+    <title>Admin Dashboard SaaS</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
 </head>
-<body class="bg-slate-50 min-h-screen font-['Plus_Jakarta_Sans']">
+<body class="bg-slate-100 min-h-screen p-4">
 
-    <div id="loginOverlay" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
-        <div class="bg-white p-8 rounded-3xl shadow-2xl max-w-md w-full">
-            <div class="text-center mb-6">
-                <span class="text-4xl">🌿</span>
-                <h2 class="text-2xl font-bold text-slate-800 mt-2">Login Admin</h2>
-                <p class="text-slate-500 text-sm">Masukkan kredensial bisnis Anda</p>
-            </div>
-            <div class="space-y-4">
-                <input type="text" id="loginBizId" placeholder="ID Bisnis (contoh: oasis-spa)" class="w-full border border-slate-200 p-3 rounded-xl outline-none focus:ring-2 focus:ring-emerald-500">
-                <input type="password" id="loginPass" placeholder="Password" class="w-full border border-slate-200 p-3 rounded-xl outline-none focus:ring-2 focus:ring-emerald-500">
-                <button onclick="handleLogin()" id="btnLogin" class="w-full bg-emerald-600 text-white font-bold py-3 rounded-xl hover:bg-emerald-700 transition">Masuk Dashboard</button>
-            </div>
+    <div id="loginBox" class="max-w-md mx-auto mt-20 bg-white p-8 rounded-2xl shadow-xl border border-slate-200">
+        <h2 class="text-2xl font-bold text-center mb-6">Admin Login 🌿</h2>
+        <div class="space-y-4">
+            <input type="text" id="user" placeholder="ID Bisnis (oasis-spa)" class="w-full border p-3 rounded-lg outline-none">
+            <input type="password" id="pass" placeholder="Password" class="w-full border p-3 rounded-lg outline-none">
+            <button onclick="prosesLogin()" id="btnLog" class="w-full bg-emerald-600 text-white py-3 rounded-lg font-bold">Masuk Sekarang</button>
         </div>
     </div>
 
-    <div id="adminContent" class="hidden">
-        <nav class="bg-white shadow-sm border-b p-4 mb-8 sticky top-0 z-10">
-            <div class="max-w-6xl mx-auto flex justify-between items-center">
-                <h1 class="text-xl font-bold text-slate-800 flex items-center gap-2">
-                    <span class="bg-emerald-100 p-2 rounded-lg text-sm">🌿</span> 
-                    <span id="displayBizName">Dashboard</span>
-                </h1>
-                <button onclick="logout()" class="text-rose-600 font-semibold text-sm hover:bg-rose-50 px-3 py-2 rounded-lg transition">Logout</button>
-            </div>
-        </nav>
-
-        <main class="max-w-6xl mx-auto p-4">
-            <div class="bg-white rounded-2xl shadow-sm overflow-hidden border border-slate-200">
-                <table class="w-full text-left">
-                    <thead>
-                        <tr class="bg-slate-50 text-slate-500 text-xs uppercase tracking-wider">
-                            <th class="p-4">Nama</th>
-                            <th class="p-4">WA</th>
-                            <th class="p-4">Jadwal</th>
-                            <th class="p-4 text-center">Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody id="bookingTable" class="divide-y divide-slate-100"></tbody>
-                </table>
-                <div id="loader" class="p-20 text-center text-slate-400">Memuat data...</div>
-            </div>
-        </main>
+    <div id="dashboard" class="hidden max-w-5xl mx-auto">
+        <div class="flex justify-between items-center mb-6">
+            <h1 id="namaToko" class="text-2xl font-bold text-slate-800">Dashboard</h1>
+            <button onclick="location.reload()" class="bg-rose-500 text-white px-4 py-2 rounded-lg text-sm">Logout</button>
+        </div>
+        
+        <div class="bg-white rounded-xl shadow-md overflow-hidden">
+            <table class="w-full text-left">
+                <thead class="bg-slate-50 border-b">
+                    <tr>
+                        <th class="p-4">Tamu</th>
+                        <th class="p-4">WhatsApp</th>
+                        <th class="p-4">Jadwal</th>
+                        <th class="p-4">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody id="isiTabel" class="divide-y"></tbody>
+            </table>
+            <div id="loadingMsg" class="p-10 text-center text-slate-400">Memuat data...</div>
+        </div>
     </div>
 
     <script>
-      // Pastikan tidak ada spasi di ujung URL atau KEY
-const SUPABASE_URL = "https://oivvcaeqfyssnphvtojg.supabase.co";
-const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9pdnZjYWVxZnlzc25waHZ0b2pnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE0NTk3NDAsImV4cCI6MjA4NzAzNTc0MH0.cG0WG5_TWu7ivdNVkz4BlGyugHwHIKRlQS50e9iXKwo";
+        const URL = "https://oivvcaeqfyssnphvtojg.supabase.co";
+        const KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9pdnZjYWVxZnlzc25waHZ0b2pnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE0NTk3NDAsImV4cCI6MjA4NzAzNTc0MH0.cG0WG5_TWu7ivdNVkz4BlGyugHwHIKRlQS50e9iXKwo";
+        const sb = supabase.createClient(URL, KEY);
 
-// Inisialisasi client
-const client = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        let dataToko = null;
 
-async function handleLogin() {
-    const bizId = document.getElementById('loginBizId').value.trim().toLowerCase();
-    const pass = document.getElementById('loginPass').value.trim();
+        async function prosesLogin() {
+            const u = document.getElementById('user').value.trim().toLowerCase();
+            const p = document.getElementById('pass').value.trim();
+            const btn = document.getElementById('btnLog');
 
-    // LOG UNTUK DEBUG (Lihat di F12 Console)
-    console.log("Mencari ID:", bizId);
-
-    // Gunakan query paling simpel
-    const { data, error } = await client
-        .from('businesses')
-        .select('*')
-        .eq('id', bizId);
-
-    if (error) {
-        console.error("Error Detail:", error);
-        alert("Koneksi Error: " + error.message);
-        return;
-    }
-
-    // Cek apakah data ditemukan dalam array
-    if (data && data.length > 0) {
-        const user = data[0];
-        if (user.admin_password === pass) {
-            console.log("Login Sukses!");
-            localStorage.setItem('oasis_session', JSON.stringify(user));
-            showDashboard(user);
-        } else {
-            alert("Password Salah!");
-        }
-    } else {
-        alert("ID Bisnis '" + bizId + "' tidak ditemukan di database. Silakan cek Tabel Editor Supabase.");
-    }
-}
-        function showDashboard(bizData) {
-            currentBiz = bizData;
-            document.getElementById('loginOverlay').classList.add('hidden');
-            document.getElementById('adminContent').classList.remove('hidden');
-            document.getElementById('displayBizName').innerText = bizData.business_name;
-            fetchBookings();
-        }
-
-        async function fetchBookings() {
-            const { data, error } = await client
-                .from('bookings')
-                .select('*')
-                .eq('business_id', currentBiz.id)
-                .order('booking_date', { ascending: true });
-
-            document.getElementById('loader').classList.add('hidden');
-            const tableBody = document.getElementById('bookingTable');
-            tableBody.innerHTML = '';
+            btn.innerText = "Mengecek...";
+            
+            const { data, error } = await sb.from('businesses').select('*').eq('id', u).eq('admin_password', p).maybeSingle();
 
             if (data) {
-                data.forEach(item => {
-                    tableBody.innerHTML += `
-                        <tr class="hover:bg-slate-50">
-                            <td class="p-4 font-bold">${item.client_name}</td>
-                            <td class="p-4">${item.client_wa}</td>
-                            <td class="p-4 text-sm">${item.booking_date} | ${item.booking_time}</td>
-                            <td class="p-4 text-center">
-                                <button onclick="deleteBooking('${item.id}')" class="text-emerald-600 font-bold">SELESAI</button>
-                            </td>
+                dataToko = data;
+                document.getElementById('loginBox').classList.add('hidden');
+                document.getElementById('dashboard').classList.remove('hidden');
+                document.getElementById('namaToko').innerText = data.business_name;
+                ambilBooking();
+            } else {
+                alert("ID atau Password Salah!");
+                btn.innerText = "Masuk Sekarang";
+            }
+        }
+
+        async function ambilBooking() {
+            const { data, error } = await sb.from('bookings').select('*').eq('business_id', dataToko.id);
+            document.getElementById('loadingMsg').classList.add('hidden');
+            const tabel = document.getElementById('isiTabel');
+            tabel.innerHTML = '';
+
+            if (data) {
+                data.forEach(b => {
+                    tabel.innerHTML += `
+                        <tr>
+                            <td class="p-4 font-bold">${b.client_name}</td>
+                            <td class="p-4">${b.client_wa}</td>
+                            <td class="p-4">${b.booking_date} | ${b.booking_time}</td>
+                            <td class="p-4"><button onclick="hapus('${b.id}')" class="text-emerald-600 font-bold">SELESAI</button></td>
                         </tr>
                     `;
                 });
             }
         }
 
-        async function deleteBooking(id) {
-            if (!confirm("Selesaikan reservasi ini?")) return;
-            await client.from('bookings').delete().eq('id', id);
-            fetchBookings();
-        }
-
-        function logout() {
-            localStorage.removeItem('oasis_session');
-            window.location.reload();
+        async function hapus(id) {
+            await sb.from('bookings').delete().eq('id', id);
+            ambilBooking();
         }
     </script>
 </body>
