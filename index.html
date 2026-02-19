@@ -2,93 +2,49 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reservasi Online</title>
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-emerald-50 min-h-screen flex items-center justify-center p-4 font-sans">
+<body class="bg-emerald-50 min-h-screen flex items-center justify-center p-4">
 
-    <div id="bookingCard" class="bg-white p-8 rounded-[2.5rem] shadow-2xl shadow-emerald-200/50 w-full max-w-md border border-white relative overflow-hidden hidden">
-        <div class="absolute top-0 right-0 w-24 h-24 bg-emerald-500/10 rounded-full -mr-10 -mt-10"></div>
-        
-        <div class="text-center mb-8">
-            <span class="text-4xl">✨</span>
-            <h1 id="namaBisnis" class="text-2xl font-black text-slate-800 mt-2 italic">Loading...</h1>
-            <p class="text-slate-400 text-sm">Silakan isi formulir reservasi di bawah ini</p>
-        </div>
-
+    <div id="mainBox" class="bg-white p-8 rounded-[2.5rem] shadow-2xl w-full max-w-md border hidden">
+        <h1 id="namaToko" class="text-2xl font-black text-center text-slate-800 italic mb-6">--</h1>
         <form id="formBooking" class="space-y-4">
-            <div>
-                <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Nama Lengkap</label>
-                <input type="text" id="nama" placeholder="Masukkan nama Anda" required
-                    class="w-full mt-1 px-4 py-3.5 rounded-2xl border border-slate-100 bg-slate-50 focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 outline-none transition-all">
-            </div>
-
-            <div>
-                <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Nomor WhatsApp</label>
-                <input type="number" id="wa" placeholder="62812xxxx" required
-                    class="w-full mt-1 px-4 py-3.5 rounded-2xl border border-slate-100 bg-slate-50 focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 outline-none transition-all">
-            </div>
-
+            <input type="text" id="nama" placeholder="Nama Lengkap" required class="w-full p-4 rounded-2xl border bg-slate-50">
+            <input type="number" id="wa" placeholder="Nomor WhatsApp" required class="w-full p-4 rounded-2xl border bg-slate-50">
             <div class="grid grid-cols-2 gap-4">
-                <div>
-                    <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Tanggal</label>
-                    <input type="date" id="tgl" required
-                        class="w-full mt-1 px-4 py-3.5 rounded-2xl border border-slate-100 bg-slate-50 focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 outline-none transition-all text-sm">
-                </div>
-                <div>
-                    <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Jam</label>
-                    <input type="time" id="jam" required
-                        class="w-full mt-1 px-4 py-3.5 rounded-2xl border border-slate-100 bg-slate-50 focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 outline-none transition-all text-sm">
-                </div>
+                <input type="date" id="tgl" required class="w-full p-4 rounded-2xl border bg-slate-50 text-sm">
+                <input type="time" id="jam" required class="w-full p-4 rounded-2xl border bg-slate-50 text-sm">
             </div>
-
-            <button type="submit" id="btnKirim"
-                class="w-full bg-emerald-600 text-white font-bold py-4 rounded-2xl hover:bg-emerald-700 transition-all active:scale-[0.98] shadow-xl shadow-emerald-200 mt-4">
-                Konfirmasi Reservasi
-            </button>
+            <button type="submit" id="btn" class="w-full bg-emerald-600 text-white font-bold py-5 rounded-2xl shadow-xl hover:bg-emerald-700 transition">Booking Sekarang</button>
         </form>
     </div>
 
-    <div id="errorState" class="hidden text-center p-8 bg-white rounded-3xl shadow-xl">
-        <span class="text-5xl">⚠️</span>
-        <h2 class="text-xl font-bold mt-4 text-slate-800">Toko Tidak Ditemukan</h2>
-        <p class="text-slate-500 text-sm mt-2">Pastikan URL yang Anda buka sudah benar.</p>
+    <div id="inactiveBox" class="hidden text-center bg-white p-10 rounded-[2.5rem] shadow-xl">
+        <h2 class="text-xl font-bold text-slate-800">Layanan Non-Aktif</h2>
+        <p class="text-slate-400 mt-2">Toko ini belum mengaktifkan layanan reservasi.</p>
     </div>
 
     <script>
         const SB_URL = "https://strylleubkvuirsknqbk.supabase.co";
         const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN0cnlsbGV1Ymt2dWlyc2tucWJrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE0ODM2OTksImV4cCI6MjA4NzA1OTY5OX0.sfnSvVgUoBRgwDyYY5VBAaHPHM_rPKBQ4a3w1ziKgUw";
         const sb = supabase.createClient(SB_URL, SB_KEY);
+        const bizId = new URLSearchParams(window.location.search).get('id');
 
-        // Ambil ID dari URL (?id=nama-toko)
-        const params = new URLSearchParams(window.location.search);
-        const bizId = params.get('id');
-
-        async function initPage() {
-            if (!bizId) {
-                document.getElementById('errorState').classList.remove('hidden');
-                return;
-            }
-
-            // Cek apakah toko ada di database
-            const { data, error } = await sb.from('businesses').select('business_name').eq('id', bizId).maybeSingle();
-
-            if (data) {
-                document.getElementById('namaBisnis').innerText = data.business_name;
-                document.getElementById('bookingCard').classList.remove('hidden');
+        async function init() {
+            if(!bizId) return;
+            const { data } = await sb.from('businesses').select('*').eq('id', bizId).maybeSingle();
+            if(data && data.is_active) {
+                document.getElementById('namaToko').innerText = data.business_name;
+                document.getElementById('mainBox').classList.remove('hidden');
             } else {
-                document.getElementById('errorState').classList.remove('hidden');
+                document.getElementById('inactiveBox').classList.remove('hidden');
             }
         }
 
         document.getElementById('formBooking').onsubmit = async (e) => {
             e.preventDefault();
-            const btn = document.getElementById('btnKirim');
-            btn.innerText = "Mengirim...";
-            btn.disabled = true;
-
             const payload = {
                 business_id: bizId,
                 client_name: document.getElementById('nama').value,
@@ -96,20 +52,14 @@
                 booking_date: document.getElementById('tgl').value,
                 booking_time: document.getElementById('jam').value
             };
-
             const { error } = await sb.from('bookings').insert([payload]);
-
-            if (error) {
-                alert("Gagal mengirim reservasi: " + error.message);
-                btn.innerText = "Konfirmasi Reservasi";
-                btn.disabled = false;
-            } else {
-                alert("Berhasil! Reservasi Anda telah terkirim.");
-                location.reload(); // Refresh untuk membersihkan form
+            if(!error) { 
+                alert("Berhasil Terkirim!"); 
+                location.reload(); 
             }
         };
 
-        initPage();
+        init();
     </script>
 </body>
 </html>
