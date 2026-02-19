@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Super Admin - Revenue Tracker & Follow Up</title>
+    <title>Super Admin - SaaSBOOK Revenue & Follow Up</title>
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -13,6 +13,7 @@
         .glass-card { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.1); }
         ::-webkit-scrollbar { width: 5px; }
         ::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
+        .btn-active { transform: scale(0.98); }
     </style>
 </head>
 <body class="bg-[#0f172a] text-slate-200 min-h-screen">
@@ -31,7 +32,7 @@
         </div>
     </div>
 
-    <div id="mainArea" class="hidden p-4 md:p-10">
+    <div id="mainArea" class="hidden p-4 md:p-10 animate-in fade-in duration-500">
         <div class="max-w-7xl mx-auto">
             
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4">
@@ -61,7 +62,7 @@
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 
                 <div class="lg:col-span-2 glass-card p-8 rounded-[2.5rem]">
-                    <h4 class="font-bold mb-6 text-slate-400 uppercase text-xs tracking-widest italic">Pertumbuhan Mitra Baru</h4>
+                    <h4 class="font-bold mb-6 text-slate-400 uppercase text-xs tracking-widest italic text-center md:text-left">Pertumbuhan Mitra Baru</h4>
                     <canvas id="growthChart" height="150"></canvas>
                 </div>
 
@@ -84,33 +85,35 @@
         const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN0cnlsbGV1Ymt2dWlyc2tucWJrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE0ODM2OTksImV4cCI6MjA4NzA1OTY5OX0.sfnSvVgUoBRgwDyYY5VBAaHPHM_rPKBQ4a3w1ziKgUw";
         const sb = supabase.createClient(SB_URL, SB_KEY);
 
-        // CONFIG FONNTE ANDA (Ganti dengan token Anda)
+        // CONFIG FONNTE ANDA
         const DEV_WA_TOKEN = "5dApyiRqU4nLdgaD1ncQ";
 
         async function login() {
             const u = document.getElementById('user').value;
             const p = document.getElementById('pass').value;
-            const { data } = await sb.from('super_admins').select('*').eq('username', u).eq('password', p).maybeSingle();
+            const { data, error } = await sb.from('super_admins').select('*').eq('username', u).eq('password', p).maybeSingle();
 
             if (data) {
                 document.getElementById('loginArea').classList.add('hidden');
                 document.getElementById('mainArea').classList.remove('hidden');
                 loadDashboardData();
-            } else { alert("Akses Ditolak!"); }
+            } else { 
+                alert("Login Gagal! Pastikan Username & Password benar."); 
+            }
         }
 
         async function loadDashboardData() {
-            const { data: businesses } = await sb.from('businesses').select('*').order('created_at', { ascending: false });
+            const { data: businesses, error } = await sb.from('businesses').select('*').order('created_at', { ascending: false });
             
+            if(error) return console.error("Database Error:", error);
+
             const active = businesses.filter(b => b.is_active);
             const pending = businesses.filter(b => !b.is_active);
 
-            // Update Statistik
             document.getElementById('revTotal').innerText = "Rp " + (active.length * 500000).toLocaleString('id-ID');
             document.getElementById('activeCount').innerText = active.length;
             document.getElementById('pendingCount').innerText = pending.length;
 
-            // List Mitra
             const list = document.getElementById('listMitra');
             list.innerHTML = "";
             
@@ -153,33 +156,49 @@
         }
 
         async function followUp(wa, namaToko) {
+            // PERBAIKAN: Pembersihan format nomor WA
+            let cleanWa = wa.toString().replace(/\D/g, ''); 
+            if (cleanWa.startsWith('0')) cleanWa = '62' + cleanWa.slice(1);
+            if (cleanWa.startsWith('8')) cleanWa = '62' + cleanWa;
+
             const pesan = `Halo kak! Kami dari SaaSBOOK Team. 👋\n\nKami melihat Anda telah mendaftarkan *${namaToko}* ke sistem kami. Saat ini status akun Anda masih Pending.\n\nJangan lewatkan kesempatan untuk mendigitalisasi reservasi Anda hanya dengan *Rp 500.000 / tahun*.\n\nApakah ada kendala dalam proses pembayaran lisensi? Kami siap membantu. 😊`;
             
-            // Mengirim via Fonnte
             try {
                 const res = await fetch('https://api.fonnte.com/send', {
                     method: 'POST',
                     headers: { 'Authorization': DEV_WA_TOKEN },
-                    body: new URLSearchParams({ 'target': wa, 'message': pesan })
+                    body: new URLSearchParams({ 'target': cleanWa, 'message': pesan })
                 });
+                
                 const result = await res.json();
-                if(result.status) alert("Pesan Follow-up terkirim ke " + wa);
-                else alert("Gagal kirim via Fonnte: " + result.reason);
+                console.log("Fonnte Response:", result);
+
+                if(result.status) {
+                    alert("✅ Berhasil! Pesan follow-up terkirim ke " + cleanWa);
+                } else {
+                    throw new Error(result.reason || "Kirim pesan gagal");
+                }
             } catch (err) {
-                // Fallback ke WhatsApp Web jika Fonnte bermasalah
-                window.open(`https://wa.me/${wa}?text=${encodeURIComponent(pesan)}`, '_blank');
+                console.error("Fonnte Error:", err);
+                alert("⚠️ Gagal via API Fonnte. Mengalihkan ke WhatsApp Web...");
+                window.open(`https://wa.me/${cleanWa}?text=${encodeURIComponent(pesan)}`, '_blank');
             }
         }
 
         async function toggleAktivasi(id, status) {
+            if(!confirm(status ? "Aktifkan Lisensi?" : "Cabut Lisensi?")) return;
             const { error } = await sb.from('businesses').update({ is_active: status }).eq('id', id);
             if(!error) loadDashboardData();
+            else alert("Error Database: " + error.message);
         }
 
         function renderChart(data) {
             const ctx = document.getElementById('growthChart').getContext('2d');
             const monthlyCounts = new Array(12).fill(0);
-            data.forEach(item => monthlyCounts[new Date(item.created_at).getMonth()]++);
+            data.forEach(item => {
+                const date = new Date(item.created_at);
+                monthlyCounts[date.getMonth()]++;
+            });
 
             if (window.myChart) window.myChart.destroy();
             window.myChart = new Chart(ctx, {
@@ -193,15 +212,17 @@
                         fill: true,
                         tension: 0.4,
                         borderWidth: 3,
-                        pointRadius: 4
+                        pointRadius: 4,
+                        pointBackgroundColor: '#10b981'
                     }]
                 },
                 options: {
                     responsive: true,
+                    maintainAspectRatio: false,
                     plugins: { legend: { display: false } },
                     scales: {
-                        y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' } },
-                        x: { grid: { display: false } }
+                        y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#64748b' } },
+                        x: { grid: { display: false }, ticks: { color: '#64748b' } }
                     }
                 }
             });
