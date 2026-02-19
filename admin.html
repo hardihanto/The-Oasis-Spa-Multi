@@ -69,36 +69,35 @@
             }
         }
 
-       async function handleLogin() {
+      async function handleLogin() {
     const bizId = document.getElementById('loginBizId').value.trim().toLowerCase();
     const pass = document.getElementById('loginPass').value.trim();
     const btn = document.getElementById('btnLogin');
 
-    console.log("Mencoba login ke ID:", bizId); // Debugging
-
+    btn.innerText = "Checking...";
+    
+    // Coba ambil data tanpa filter password dulu untuk tes kolom
     const { data, error } = await client
         .from('businesses')
         .select('*')
         .eq('id', bizId)
-        .eq('admin_password', pass)
         .maybeSingle();
 
     if (error) {
-        console.error("Error Supabase:", error.message);
-        alert("Database Error: " + error.message);
+        console.error("Detail Error:", error);
+        alert("Error Database: " + error.message);
+        btn.innerText = "Masuk Dashboard";
         return;
     }
 
-    if (data) {
-        console.log("Login Berhasil:", data);
+    if (data && data.admin_password === pass) {
         localStorage.setItem('oasis_session', JSON.stringify(data));
         showDashboard(data);
     } else {
-        console.log("Data tidak ditemukan untuk kombinasi tersebut.");
-        alert("Login Gagal! ID Bisnis atau Password tidak terdaftar di database.");
+        alert("Login Gagal! ID atau Password salah.");
+        btn.innerText = "Masuk Dashboard";
     }
 }
-
         function showDashboard(bizData) {
             currentBiz = bizData;
             document.getElementById('loginOverlay').classList.add('hidden');
