@@ -1,0 +1,8 @@
+{
+  "routes": [
+    { "src": "/register", "dest": "/register.html" },
+    { "src": "/super-admin", "dest": "/super-admin.html" },
+    { "handle": "filesystem" },
+    { "src": "/(.*)", "status": 404, "dest": "/register.html" }
+  ]
+}
