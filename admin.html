@@ -69,32 +69,35 @@
             }
         }
 
-        async function handleLogin() {
-            const bizId = document.getElementById('loginBizId').value.trim().toLowerCase();
-            const pass = document.getElementById('loginPass').value.trim();
-            const btn = document.getElementById('btnLogin');
+       async function handleLogin() {
+    const bizId = document.getElementById('loginBizId').value.trim().toLowerCase();
+    const pass = document.getElementById('loginPass').value.trim();
+    const btn = document.getElementById('btnLogin');
 
-            if (!bizId || !pass) return alert("Isi semua data!");
-            
-            btn.innerText = "Mengecek...";
-            btn.disabled = true;
+    console.log("Mencoba login ke ID:", bizId); // Debugging
 
-            const { data, error } = await client
-                .from('businesses')
-                .select('*')
-                .eq('id', bizId)
-                .eq('admin_password', pass)
-                .maybeSingle();
+    const { data, error } = await client
+        .from('businesses')
+        .select('*')
+        .eq('id', bizId)
+        .eq('admin_password', pass)
+        .maybeSingle();
 
-            if (data) {
-                localStorage.setItem('oasis_session', JSON.stringify(data));
-                showDashboard(data);
-            } else {
-                alert("Login Gagal! Cek ID Bisnis & Password.");
-                btn.innerText = "Masuk Dashboard";
-                btn.disabled = false;
-            }
-        }
+    if (error) {
+        console.error("Error Supabase:", error.message);
+        alert("Database Error: " + error.message);
+        return;
+    }
+
+    if (data) {
+        console.log("Login Berhasil:", data);
+        localStorage.setItem('oasis_session', JSON.stringify(data));
+        showDashboard(data);
+    } else {
+        console.log("Data tidak ditemukan untuk kombinasi tersebut.");
+        alert("Login Gagal! ID Bisnis atau Password tidak terdaftar di database.");
+    }
+}
 
         function showDashboard(bizData) {
             currentBiz = bizData;
