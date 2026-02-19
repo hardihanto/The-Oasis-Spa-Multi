@@ -2,46 +2,54 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>Pendaftaran Bisnis Baru</title>
+    <title>SaaS Register - Mulai Bisnis Anda</title>
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+<body class="bg-slate-100 min-h-screen flex items-center justify-center p-4">
 
-    <div class="bg-white p-8 rounded-lg shadow-md w-full max-w-md text-center">
-        <h2 class="text-2xl font-bold mb-6">Daftarkan Toko Anda</h2>
+    <div class="bg-white p-8 rounded-3xl shadow-xl w-full max-w-md border border-slate-200">
+        <h2 class="text-2xl font-bold text-center text-slate-800 mb-6">Pendaftaran Bisnis Baru</h2>
         
         <div class="space-y-4">
-            <input type="text" id="bizId" placeholder="ID Bisnis (contoh: oasis-spa)" class="w-full border p-3 rounded">
-            <input type="text" id="bizName" placeholder="Nama Toko" class="w-full border p-3 rounded">
-            <input type="password" id="bizPass" placeholder="Password Admin" class="w-full border p-3 rounded">
-            <button onclick="simpanKeDatabase()" id="btnSubmit" class="w-full bg-blue-600 text-white p-3 rounded font-bold hover:bg-blue-700">
-                Daftar Sekarang
+            <div>
+                <label class="text-xs font-bold text-slate-500 uppercase ml-1">ID Bisnis (oasis-spa)</label>
+                <input type="text" id="bizId" placeholder="ID unik tanpa spasi" class="w-full border p-3 rounded-xl outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+            <div>
+                <label class="text-xs font-bold text-slate-500 uppercase ml-1">Nama Toko</label>
+                <input type="text" id="bizName" placeholder="Contoh: The Oasis Spa" class="w-full border p-3 rounded-xl outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+            <div>
+                <label class="text-xs font-bold text-slate-500 uppercase ml-1">Password Admin</label>
+                <input type="password" id="bizPass" placeholder="••••••••" class="w-full border p-3 rounded-xl outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+            <button onclick="simpan()" id="btnSubmit" class="w-full bg-blue-600 text-white p-4 rounded-xl font-bold hover:bg-blue-700 transition active:scale-95 shadow-lg shadow-blue-100">
+                Daftar & Aktifkan Dashboard
             </button>
         </div>
         
-        <p id="msg" class="mt-4 text-sm font-medium"></p>
+        <p id="msg" class="mt-6 text-center text-sm font-semibold"></p>
     </div>
 
     <script>
-        // KREDENSIAL (Pastikan URL & KEY Anda Benar)
-        const URL = "https://oivvcaeqfyssnphvtojg.supabase.co";
-        const KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9pdnZjYWVxZnlzc25waHZ0b2pnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE0NTk3NDAsImV4cCI6MjA4NzAzNTc0MH0.cG0WG5_TWu7ivdNVkz4BlGyugHwHIKRlQS50e9iXKwo";
+        const SB_URL = "https://strylleubkvuirsknqbk.supabase.co";
+        const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN0cnlsbGV1Ymt2dWlyc2tucWJrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE0ODM2OTksImV4cCI6MjA4NzA1OTY5OX0.sfnSvVgUoBRgwDyYY5VBAaHPHM_rPKBQ4a3w1ziKgUw";
         
-        const sb = supabase.createClient(URL, KEY);
+        const sb = supabase.createClient(SB_URL, SB_KEY);
 
-        async function simpanKeDatabase() {
+        async function simpan() {
             const id = document.getElementById('bizId').value.trim().toLowerCase();
             const nama = document.getElementById('bizName').value.trim();
             const pass = document.getElementById('bizPass').value.trim();
             const msg = document.getElementById('msg');
+            const btn = document.getElementById('btnSubmit');
 
-            if (!id || !nama || !pass) return alert("Semua kolom harus diisi!");
+            if (!id || !nama || !pass) return alert("Lengkapi semua data!");
 
-            msg.innerText = "Mencoba menghubungi database...";
-            msg.className = "mt-4 text-blue-500";
+            btn.innerText = "Sedang mendaftarkan...";
+            btn.disabled = true;
 
-            // PROSES INSERT
             const { error } = await sb
                 .from('businesses')
                 .insert([{ 
@@ -51,12 +59,19 @@
                 }]);
 
             if (error) {
-                console.error(error);
                 msg.innerText = "GAGAL: " + error.message;
-                msg.className = "mt-4 text-red-500";
+                msg.className = "mt-6 text-center text-red-500";
+                btn.innerText = "Daftar & Aktifkan Dashboard";
+                btn.disabled = false;
             } else {
-                msg.innerText = "BERHASIL! Toko " + nama + " terdaftar.";
-                msg.className = "mt-4 text-green-500";
+                msg.innerText = "BERHASIL! Toko " + nama + " siap digunakan.";
+                msg.className = "mt-6 text-center text-green-600";
+                // Reset form
+                document.getElementById('bizId').value = "";
+                document.getElementById('bizName').value = "";
+                document.getElementById('bizPass').value = "";
+                btn.innerText = "Daftar & Aktifkan Dashboard";
+                btn.disabled = false;
             }
         }
     </script>
