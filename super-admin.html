@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Super Admin Panel - SaaSBOOK</title>
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-900 min-h-screen text-slate-100 font-sans">
+
+    <div id="loginArea" class="flex items-center justify-center min-h-screen">
+        <div class="bg-slate-800 p-8 rounded-[2rem] shadow-2xl w-full max-w-sm border border-slate-700">
+            <h1 class="text-2xl font-black text-center mb-6 text-emerald-400 italic">SUPER ADMIN</h1>
+            <input type="text" id="user" placeholder="Username" class="w-full p-4 mb-4 rounded-2xl bg-slate-900 border-none outline-none focus:ring-2 focus:ring-emerald-500">
+            <input type="password" id="pass" placeholder="Password" class="w-full p-4 mb-6 rounded-2xl bg-slate-900 border-none outline-none focus:ring-2 focus:ring-emerald-500">
+            <button onclick="login()" class="w-full bg-emerald-500 text-slate-900 font-black py-4 rounded-2xl hover:bg-emerald-400 transition">MASUK SYSTEM</button>
+        </div>
+    </div>
+
+    <div id="mainArea" class="hidden p-6 md:p-12 animate-in fade-in duration-500">
+        <div class="max-w-6xl mx-auto">
+            <div class="flex justify-between items-end mb-10">
+                <div>
+                    <h2 class="text-4xl font-black tracking-tighter">Manajemen Lisensi</h2>
+                    <p class="text-slate-400">Approve pendaftar baru yang sudah membayar 500rb.</p>
+                </div>
+                <button onclick="location.reload()" class="bg-slate-800 px-6 py-2 rounded-xl text-xs font-bold uppercase tracking-widest border border-slate-700">Logout</button>
+            </div>
+
+            <div class="bg-slate-800 rounded-[2.5rem] border border-slate-700 overflow-hidden shadow-2xl">
+                <table class="w-full text-left">
+                    <thead class="bg-slate-900/50 text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500">
+                        <tr>
+                            <th class="p-6">Nama Bisnis / ID</th>
+                            <th class="p-6">Kontak Owner</th>
+                            <th class="p-6">Status Lisensi</th>
+                            <th class="p-6 text-right">Aksi Approval</th>
+                        </tr>
+                    </thead>
+                    <tbody id="listToko" class="divide-y divide-slate-700">
+                        </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const SB_URL = "https://strylleubkvuirsknqbk.supabase.co";
+        const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN0cnlsbGV1Ymt2dWlyc2tucWJrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE0ODM2OTksImV4cCI6MjA4NzA1OTY5OX0.sfnSvVgUoBRgwDyYY5VBAaHPHM_rPKBQ4a3w1ziKgUw";
+        const sb = supabase.createClient(SB_URL, SB_KEY);
+
+        async function login() {
+            const u = document.getElementById('user').value;
+            const p = document.getElementById('pass').value;
+            
+            const { data } = await sb.from('super_admins').select('*').eq('username', u).eq('password', p).maybeSingle();
+
+            if (data) {
+                document.getElementById('loginArea').classList.add('hidden');
+                document.getElementById('mainArea').classList.remove('hidden');
+                loadMitra();
+            } else { alert("Akses Ditolak!"); }
+        }
+
+        async function loadMitra() {
+            const { data } = await sb.from('businesses').select('*').order('created_at', {ascending: false});
+            const list = document.getElementById('listToko');
+            list.innerHTML = "";
+
+            data.forEach(toko => {
+                const status = toko.is_active 
+                    ? `<span class="bg-emerald-500/10 text-emerald-500 px-3 py-1 rounded-full text-[10px] font-bold uppercase">AKTIF</span>`
+                    : `<span class="bg-amber-500/10 text-amber-500 px-3 py-1 rounded-full text-[10px] font-bold uppercase">PENDING</span>`;
+
+                const btn = toko.is_active
+                    ? `<button onclick="toggleAktivasi('${toko.id}', false)" class="text-[10px] font-bold text-rose-500 hover:underline">Non-aktifkan</button>`
+                    : `<button onclick="toggleAktivasi('${toko.id}', true)" class="bg-emerald-500 text-slate-900 px-6 py-2 rounded-xl text-[10px] font-black uppercase hover:bg-emerald-400 transition">APPROVE & AKTIFKAN</button>`;
+
+                list.innerHTML += `
+                    <tr class="hover:bg-slate-700/30 transition">
+                        <td class="p-6">
+                            <p class="font-bold text-lg">${toko.business_name}</p>
+                            <p class="text-xs text-slate-500 font-mono">${toko.id}</p>
+                        </td>
+                        <td class="p-6">
+                            <p class="text-sm font-medium">${toko.owner_wa}</p>
+                            <a href="https://wa.me/${toko.owner_wa}" target="_blank" class="text-[10px] text-emerald-400 hover:underline">Chat WhatsApp</a>
+                        </td>
+                        <td class="p-6">${status}</td>
+                        <td class="p-6 text-right">${btn}</td>
+                    </tr>
+                `;
+            });
+        }
+
+        async function toggleAktivasi(id, status) {
+            const confirmMsg = status ? "Aktifkan lisensi toko ini?" : "Matikan akses toko ini?";
+            if(!confirm(confirmMsg)) return;
+
+            const { error } = await sb.from('businesses').update({ is_active: status }).eq('id', id);
+            
+            if(!error) {
+                alert(status ? "Lisensi Berhasil Diaktifkan!" : "Akses Dicabut.");
+                loadMitra();
+            } else {
+                alert("Error: " + error.message);
+            }
+        }
+    </script>
+</body>
+</html>
