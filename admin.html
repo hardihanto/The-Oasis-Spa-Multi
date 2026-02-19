@@ -2,77 +2,53 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SaaS Dashboard - Pro</title>
+    <title>Admin Dashboard - SaaSBOOK</title>
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        .glass { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(12px); }
-        .loading-shimmer { background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; }
-        @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
-    </style>
 </head>
-<body class="bg-[#fcfcfd] min-h-screen text-slate-900 font-sans">
+<body class="bg-slate-50 min-h-screen font-sans">
 
-    <div id="loginArea" class="hidden flex items-center justify-center min-h-screen p-6">
-        <div class="bg-white p-10 rounded-[2.5rem] shadow-2xl shadow-slate-200 w-full max-w-md border border-slate-100">
-            <div class="text-center mb-10">
-                <div class="w-16 h-16 bg-emerald-500 rounded-2xl mx-auto flex items-center justify-center text-white text-3xl mb-4 shadow-lg shadow-emerald-200">💎</div>
-                <h2 class="text-2xl font-black">Portal Bisnis</h2>
-                <p class="text-slate-400 text-sm">Masuk untuk mengelola reservasi</p>
-            </div>
+    <div id="loginArea" class="flex items-center justify-center min-h-screen p-6">
+        <div class="bg-white p-10 rounded-[2.5rem] shadow-2xl w-full max-w-md border">
+            <h2 class="text-2xl font-black text-center mb-6">Login Dashboard</h2>
             <div class="space-y-4">
-                <input type="text" id="user" placeholder="ID Bisnis" class="w-full px-5 py-4 rounded-2xl border border-slate-200 outline-none focus:ring-4 focus:ring-emerald-500/10 transition-all">
-                <input type="password" id="pass" placeholder="Password Admin" class="w-full px-5 py-4 rounded-2xl border border-slate-200 outline-none focus:ring-4 focus:ring-emerald-500/10 transition-all">
-                <button onclick="prosesLogin()" id="btnLog" class="w-full bg-slate-900 text-white font-bold py-4 rounded-2xl hover:bg-slate-800 transition active:scale-95 shadow-xl">Masuk</button>
+                <input type="text" id="user" placeholder="ID Bisnis" class="w-full p-4 rounded-2xl border outline-none focus:ring-4 focus:ring-emerald-500/10">
+                <input type="password" id="pass" placeholder="Password" class="w-full p-4 rounded-2xl border outline-none focus:ring-4 focus:ring-emerald-500/10">
+                <button onclick="prosesLogin()" id="btnLog" class="w-full bg-slate-900 text-white font-bold py-4 rounded-2xl hover:bg-emerald-600 shadow-xl transition">Masuk</button>
+            </div>
+            <div id="pendingMsg" class="hidden mt-6 p-4 bg-amber-50 border border-amber-100 rounded-2xl text-amber-700 text-sm text-center">
+                ⚠️ <b>Akun Belum Aktif</b><br>Lisensi Anda sedang dalam tahap pending. Silakan lakukan pembayaran lisensi Rp 500.000/thn.
             </div>
         </div>
     </div>
 
-    <div id="dashArea" class="hidden animate-in fade-in slide-in-from-bottom-5 duration-700">
-        <header class="p-6 border-b bg-white/50 sticky top-0 z-20 backdrop-blur-md">
-            <div class="max-w-7xl mx-auto flex justify-between items-center">
-                <div class="flex items-center gap-3">
-                    <span class="p-2 bg-emerald-500 text-white rounded-lg font-bold">SB</span>
-                    <h1 id="txtNamaToko" class="font-black text-xl italic tracking-tighter">--</h1>
-                </div>
-                <button onclick="logout()" class="px-4 py-2 bg-rose-50 text-rose-600 rounded-xl text-xs font-bold hover:bg-rose-600 hover:text-white transition-all">LOGOUT</button>
-            </div>
-        </header>
-
-        <main class="max-w-7xl mx-auto p-6 md:p-10">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-                <div class="bg-white p-8 rounded-[2rem] border border-slate-100 shadow-sm">
-                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Total Pesanan</p>
+    <div id="dashArea" class="hidden animate-in fade-in duration-700">
+        <nav class="p-6 bg-white border-b flex justify-between items-center">
+            <h1 id="txtNamaToko" class="font-black text-xl italic text-emerald-600">--</h1>
+            <button onclick="logout()" class="text-rose-500 font-bold text-sm">Keluar</button>
+        </nav>
+        <main class="max-w-7xl mx-auto p-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
+                <div class="bg-white p-8 rounded-[2rem] shadow-sm border">
+                    <p class="text-xs font-bold text-slate-400 uppercase">Total Booking</p>
                     <h3 id="statTotal" class="text-4xl font-black mt-2">0</h3>
                 </div>
-                <div class="bg-emerald-500 p-8 rounded-[2rem] text-white shadow-lg shadow-emerald-200">
-                    <p class="text-[10px] font-bold opacity-80 uppercase tracking-widest">Hari Ini</p>
+                <div class="bg-emerald-500 p-8 rounded-[2rem] shadow-lg text-white">
+                    <p class="text-xs font-bold opacity-80 uppercase">Hari Ini</p>
                     <h3 id="statToday" class="text-4xl font-black mt-2">0</h3>
                 </div>
-                <div class="bg-white p-8 rounded-[2rem] border border-slate-100 shadow-sm">
-                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Status Server</p>
-                    <h3 class="text-xl font-black mt-2 text-emerald-500 flex items-center gap-2">
-                        <span class="w-3 h-3 bg-emerald-500 rounded-full animate-pulse"></span> AKTIF
-                    </h3>
-                </div>
             </div>
-
-            <div class="bg-white rounded-[2.5rem] border border-slate-100 shadow-sm overflow-hidden">
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left">
-                        <thead class="bg-slate-50 border-b">
-                            <tr class="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">
-                                <th class="p-6">Pelanggan</th>
-                                <th class="p-6">Kontak</th>
-                                <th class="p-6 text-center">Jadwal</th>
-                                <th class="p-6 text-right">Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody id="isiTabel" class="divide-y divide-slate-50"></tbody>
-                    </table>
-                </div>
-                <div id="loader" class="p-20 text-center text-slate-400 italic">Memuat data...</div>
+            <div class="bg-white rounded-[2rem] border overflow-hidden">
+                <table class="w-full text-left">
+                    <thead class="bg-slate-50 border-b">
+                        <tr class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                            <th class="p-6">Pelanggan</th>
+                            <th class="p-6">Tanggal & Jam</th>
+                            <th class="p-6 text-right">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="isiTabel" class="divide-y"></tbody>
+                </table>
             </div>
         </main>
     </div>
@@ -82,22 +58,31 @@
         const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN0cnlsbGV1Ymt2dWlyc2tucWJrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE0ODM2OTksImV4cCI6MjA4NzA1OTY5OX0.sfnSvVgUoBRgwDyYY5VBAaHPHM_rPKBQ4a3w1ziKgUw";
         const sb = supabase.createClient(SB_URL, SB_KEY);
 
-        let activeBizId = localStorage.getItem('active_biz_id');
+        let activeId = localStorage.getItem('active_biz_id');
 
-        // AUTO LOGIN CHECK
         window.onload = async () => {
-            if (activeBizId) {
-                const { data } = await sb.from('businesses').select('*').eq('id', activeBizId).single();
-                if(data) showDashboard(data);
+            if(activeId) {
+                const { data } = await sb.from('businesses').select('*').eq('id', activeId).single();
+                if(data && data.is_active) showDashboard(data);
                 else showLogin();
-            } else {
-                showLogin();
-            }
+            } else { showLogin(); }
         };
 
-        function showLogin() {
-            document.getElementById('loginArea').classList.remove('hidden');
-            document.getElementById('dashArea').classList.add('hidden');
+        function showLogin() { document.getElementById('loginArea').classList.remove('hidden'); }
+
+        async function prosesLogin() {
+            const u = document.getElementById('user').value.toLowerCase();
+            const p = document.getElementById('pass').value;
+            const { data } = await sb.from('businesses').select('*').eq('id', u).eq('admin_password', p).maybeSingle();
+
+            if (data) {
+                if (!data.is_active) {
+                    document.getElementById('pendingMsg').classList.remove('hidden');
+                    return;
+                }
+                localStorage.setItem('active_biz_id', data.id);
+                showDashboard(data);
+            } else { alert("Login Salah!"); }
         }
 
         function showDashboard(data) {
@@ -107,58 +92,18 @@
             ambilData();
         }
 
-        async function prosesLogin() {
-            const u = document.getElementById('user').value.trim().toLowerCase();
-            const p = document.getElementById('pass').value.trim();
-            
-            const { data } = await sb.from('businesses').select('*').eq('id', u).eq('admin_password', p).maybeSingle();
-
-            if (data) {
-                localStorage.setItem('active_biz_id', data.id);
-                activeBizId = data.id;
-                showDashboard(data);
-            } else {
-                alert("ID atau Password salah!");
-            }
-        }
-
         async function ambilData() {
-            const { data } = await sb.from('bookings').select('*').eq('business_id', activeBizId).order('created_at', { ascending: false });
+            const { data } = await sb.from('bookings').select('*').eq('business_id', localStorage.getItem('active_biz_id')).order('created_at', {ascending: false});
             const tabel = document.getElementById('isiTabel');
-            const loader = document.getElementById('loader');
-            
-            loader.classList.add('hidden');
             tabel.innerHTML = "";
-            
-            // Statistik
-            const hariIni = new Date().toISOString().split('T')[0];
             document.getElementById('statTotal').innerText = data.length;
-            document.getElementById('statToday').innerText = data.filter(b => b.booking_date === hariIni).length;
-
             data.forEach(b => {
-                tabel.innerHTML += `
-                    <tr class="hover:bg-slate-50/50 transition-all">
-                        <td class="p-6 font-bold text-slate-800">${b.client_name}</td>
-                        <td class="p-6 font-medium text-emerald-600"><a href="https://wa.me/${b.client_wa}" target="_blank">${b.client_wa} ↗</a></td>
-                        <td class="p-6 text-center text-sm font-semibold">${b.booking_date} <br> <span class="text-slate-400 text-xs">${b.booking_time}</span></td>
-                        <td class="p-6 text-right">
-                            <button onclick="hapus('${b.id}')" class="bg-white border border-slate-200 text-slate-600 px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-rose-500 hover:text-white hover:border-rose-500 transition-all">Selesai</button>
-                        </td>
-                    </tr>
-                `;
+                tabel.innerHTML += `<tr><td class="p-6 font-bold">${b.client_name}<br><span class="text-xs text-emerald-600">${b.client_wa}</span></td><td class="p-6">${b.booking_date} | ${b.booking_time}</td><td class="p-6 text-right"><button onclick="hapus('${b.id}')" class="text-xs font-bold bg-slate-100 p-2 rounded-lg">SELESAI</button></td></tr>`;
             });
         }
 
-        async function hapus(id) {
-            if(!confirm("Hapus pesanan?")) return;
-            await sb.from('bookings').delete().eq('id', id);
-            ambilData();
-        }
-
-        function logout() {
-            localStorage.removeItem('active_biz_id');
-            location.reload();
-        }
+        async function hapus(id) { if(confirm("Hapus?")) { await sb.from('bookings').delete().eq('id', id); ambilData(); } }
+        function logout() { localStorage.removeItem('active_biz_id'); location.reload(); }
     </script>
 </body>
 </html>
