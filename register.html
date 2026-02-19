@@ -2,47 +2,32 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>Daftar SaaSBOOK - Lisensi Bisnis</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registrasi SaaSBOOK</title>
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-slate-900 min-h-screen flex items-center justify-center p-4">
+<body class="bg-slate-900 text-white flex items-center justify-center min-h-screen p-6">
 
-    <div class="bg-white p-8 rounded-[2.5rem] shadow-2xl w-full max-w-md">
-        <div class="text-center mb-8">
-            <h1 class="text-3xl font-black text-slate-800">Mulai Bisnis</h1>
-            <p class="text-slate-400 text-sm mt-2">Daftarkan usaha Anda & aktifkan lisensi</p>
-        </div>
+    <div class="bg-slate-800 p-8 rounded-[2rem] shadow-2xl w-full max-w-md border border-white/10">
+        <h2 class="text-2xl font-bold mb-6 text-emerald-400">Daftar Mitra Baru</h2>
         
         <div class="space-y-4">
             <div>
-                <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">ID Bisnis (untuk URL)</label>
-                <input type="text" id="bizId" placeholder="contoh: mawar-spa" class="w-full border p-4 rounded-2xl outline-none focus:ring-4 focus:ring-emerald-500/10">
-            </div>
-            <div>
-                <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Nama Toko/Usaha</label>
-                <input type="text" id="bizName" placeholder="Contoh: Mawar Spa & Reflexology" class="w-full border p-4 rounded-2xl outline-none focus:ring-4 focus:ring-emerald-500/10">
-            </div>
-            <div>
-                <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">WhatsApp Anda (Aktif)</label>
-                <input type="number" id="ownerWa" placeholder="62812345678" class="w-full border p-4 rounded-2xl outline-none focus:ring-4 focus:ring-emerald-500/10">
-            </div>
-            <div>
-                <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Password Admin</label>
-                <input type="password" id="bizPass" placeholder="••••••••" class="w-full border p-4 rounded-2xl outline-none focus:ring-4 focus:ring-emerald-500/10">
-            </div>
-            
-            <div class="p-4 bg-emerald-50 rounded-2xl border border-emerald-100">
-                <p class="text-[10px] text-emerald-600 font-bold uppercase tracking-widest">Biaya Lisensi</p>
-                <p class="text-lg font-black text-emerald-700">Rp 500.000 <span class="text-sm font-normal">/ tahun</span></p>
+                <label class="text-xs text-slate-400 uppercase font-bold">Nama Bisnis / Toko</label>
+                <input type="text" id="bizName" placeholder="Contoh: Barbershop Ganteng" class="w-full bg-slate-900 border border-white/10 p-4 rounded-xl outline-none focus:ring-2 focus:ring-emerald-500">
             </div>
 
-            <button onclick="daftar()" id="btnSubmit" class="w-full bg-slate-900 text-white p-5 rounded-2xl font-bold hover:bg-emerald-600 transition active:scale-95 shadow-xl">
-                Daftar & Terima Instruksi Bayar
+            <div>
+                <label class="text-xs text-slate-400 uppercase font-bold">Nomor WhatsApp (Aktif)</label>
+                <input type="number" id="bizWA" placeholder="Contoh: 08123456789" class="w-full bg-slate-900 border border-white/10 p-4 rounded-xl outline-none focus:ring-2 focus:ring-emerald-500">
+                <p class="text-[10px] text-slate-500 mt-1 italic">*Pastikan nomor terhubung dengan WhatsApp</p>
+            </div>
+
+            <button onclick="register()" id="btnReg" class="w-full bg-emerald-500 text-slate-900 font-bold py-4 rounded-xl hover:bg-emerald-400 transition mt-4">
+                DAFTAR SEKARANG
             </button>
         </div>
-        
-        <p id="msg" class="mt-6 text-center text-sm font-semibold"></p>
     </div>
 
     <script>
@@ -50,39 +35,31 @@
         const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN0cnlsbGV1Ymt2dWlyc2tucWJrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE0ODM2OTksImV4cCI6MjA4NzA1OTY5OX0.sfnSvVgUoBRgwDyYY5VBAaHPHM_rPKBQ4a3w1ziKgUw";
         const sb = supabase.createClient(SB_URL, SB_KEY);
 
-        async function daftar() {
-            const id = document.getElementById('bizId').value.trim().toLowerCase();
-            const nama = document.getElementById('bizName').value.trim();
-            const wa = document.getElementById('ownerWa').value.trim();
-            const pass = document.getElementById('bizPass').value.trim();
-            const msg = document.getElementById('msg');
-            const btn = document.getElementById('btnSubmit');
+        async function register() {
+            const name = document.getElementById('bizName').value;
+            const wa = document.getElementById('bizWA').value;
+            const btn = document.getElementById('btnReg');
 
-            if (!id || !nama || !wa || !pass) return alert("Lengkapi data!");
+            if(!name || !wa) return alert("Mohon isi semua data!");
 
             btn.innerText = "Memproses...";
             btn.disabled = true;
 
-            const { error } = await sb.from('businesses').insert([{ 
-                id, business_name: nama, owner_wa: wa, admin_password: pass, is_active: false 
-            }]);
+            const { error } = await sb.from('businesses').insert([
+                { 
+                    business_name: name, 
+                    owner_wa: wa, 
+                    is_active: false // Default pending sampai di-approve admin
+                }
+            ]);
 
-            if (error) {
-                msg.innerText = "Error: " + error.message;
-                msg.className = "mt-6 text-red-500";
-                btn.disabled = false;
+            if(!error) {
+                alert("Pendaftaran Berhasil! Admin akan menghubungi Anda via WhatsApp.");
+                location.reload();
             } else {
-                // NOTIFIKASI FONNTE (Ganti TOKEN_ANDA dengan Token Fonnte Developer)
-                const pesan = `Halo *${nama}*!\n\nTerima kasih telah mendaftar di SaaSBOOK.\n\nStatus: *PENDING (Belum Aktif)*.\n\nUntuk mengaktifkan sistem pendaftaran Anda, silakan lakukan pembayaran lisensi tahunan:\n💰 *Rp 500.000 / tahun*\n🏦 Rekening: [NOMOR REKENING ANDA]\n\nSetelah bayar, kirim bukti transfer ke sini untuk proses Approval.`;
-
-                await fetch('https://api.fonnte.com/send', {
-                    method: 'POST',
-                    headers: { 'Authorization': '5dApyiRqU4nLdgaD1ncQ' },
-                    body: new URLSearchParams({ 'target': wa, 'message': pesan })
-                });
-
-                msg.innerText = "BERHASIL! Cek WhatsApp Anda untuk instruksi aktivasi.";
-                msg.className = "mt-6 text-green-600";
+                alert("Gagal daftar: " + error.message);
+                btn.innerText = "DAFTAR SEKARANG";
+                btn.disabled = false;
             }
         }
     </script>
